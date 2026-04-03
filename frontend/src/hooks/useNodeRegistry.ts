@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getNodes } from '@/lib/api'
 import type { NodeManifestWithUI } from '@/lib/types'
 
@@ -6,31 +6,42 @@ interface NodeRegistryState {
   manifests: NodeManifestWithUI[]
   loading: boolean
   error: string | null
+  refresh: () => void
 }
 
 export function useNodeRegistry(): NodeRegistryState {
-  const [state, setState] = useState<NodeRegistryState>({
-    manifests: [],
-    loading: true,
-    error: null,
-  })
+  const [manifests, setManifests] = useState<NodeManifestWithUI[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [tick, setTick] = useState(0)
+
+  const refresh = useCallback(() => {
+    setTick(t => t + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
 
     getNodes()
-      .then(manifests => {
-        if (!cancelled) setState({ manifests, loading: false, error: null })
+      .then(data => {
+        if (!cancelled) {
+          setManifests(data)
+          setLoading(false)
+          setError(null)
+        }
       })
       .catch((err: unknown) => {
         if (!cancelled) {
           const message = err instanceof Error ? err.message : 'Failed to load nodes'
-          setState({ manifests: [], loading: false, error: message })
+          setManifests([])
+          setLoading(false)
+          setError(message)
         }
       })
 
     return () => { cancelled = true }
-  }, [])
+  }, [tick])
 
-  return state
+  return { manifests, loading, error, refresh }
 }

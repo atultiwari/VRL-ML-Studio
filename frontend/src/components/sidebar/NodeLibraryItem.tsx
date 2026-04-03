@@ -33,6 +33,12 @@ export function NodeLibraryItem({ manifest }: NodeLibraryItemProps) {
 
       <span className="min-w-0 flex-1 truncate font-medium">{manifest.name}</span>
 
+      {!manifest.is_builtin && (
+        <span className="shrink-0 rounded bg-violet-500/20 px-1 py-px text-[8px] font-semibold uppercase leading-none text-violet-400">
+          custom
+        </span>
+      )}
+
       {manifest.badge_text && (
         <span
           className="shrink-0 rounded px-1 py-px text-[9px] font-bold uppercase leading-none text-white"

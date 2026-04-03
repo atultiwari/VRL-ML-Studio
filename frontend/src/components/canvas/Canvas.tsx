@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,6 +11,7 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { NodeCard } from './NodeCard'
+import { NodeContextMenu } from './NodeContextMenu'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
 import type { NodeManifestWithUI } from '@/lib/types'
@@ -25,8 +26,16 @@ interface CanvasProps {
   manifests: NodeManifestWithUI[]
 }
 
+interface ContextMenuState {
+  x: number
+  y: number
+  nodeId: string
+  nodeType: string
+}
+
 export function Canvas({ manifests }: CanvasProps) {
   const rfInstanceRef = useRef<ReactFlowInstance | null>(null)
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
 
   const nodes         = usePipelineStore(s => s.nodes)
   const edges         = usePipelineStore(s => s.edges)
@@ -96,8 +105,30 @@ export function Canvas({ manifests }: CanvasProps) {
     openOutputPanel(node.id)
   }, [openOutputPanel])
 
+  const onNodeContextMenu: NodeMouseHandler = useCallback((e, node) => {
+    e.preventDefault()
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      nodeId: node.id,
+      nodeType: (node.data as { manifest?: { id?: string } })?.manifest?.id ?? '',
+    })
+  }, [])
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null)
+  }, [])
+
+  const deleteNode = useCallback((nodeId: string) => {
+    const { nodes: cur, edges: curEdges } = usePipelineStore.getState()
+    onNodesChange(cur.filter(n => n.id === nodeId).map(n => ({ type: 'remove' as const, id: n.id })))
+    onEdgesChange(curEdges.filter(e => e.source === nodeId || e.target === nodeId).map(e => ({ type: 'remove' as const, id: e.id })))
+    pushSnapshot()
+  }, [onNodesChange, onEdgesChange, pushSnapshot])
+
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null)
+    setContextMenu(null)
   }, [setSelectedNodeId])
 
   return (
@@ -115,6 +146,7 @@ export function Canvas({ manifests }: CanvasProps) {
         onNodeDragStop={onNodeDragStop}
         onNodeClick={onNodeClick}
         onNodeDoubleClick={onNodeDoubleClick}
+        onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
         onInit={instance => { rfInstanceRef.current = instance }}
         nodeTypes={NODE_TYPES}
@@ -151,6 +183,17 @@ export function Canvas({ manifests }: CanvasProps) {
           maskColor="hsl(222 20% 7% / 0.7)"
         />
       </ReactFlow>
+
+      {contextMenu && (
+        <NodeContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          nodeId={contextMenu.nodeId}
+          nodeType={contextMenu.nodeType}
+          onClose={closeContextMenu}
+          onDelete={deleteNode}
+        />
+      )}
 
       {/* Empty state overlay */}
       {nodes.length === 0 && (

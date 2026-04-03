@@ -52,3 +52,22 @@ export async function exportNotebook(
   }, { responseType: 'blob' })
   return data
 }
+
+export async function importNodePackage(
+  file: File,
+  projectPath?: string,
+): Promise<{ id: string; name: string; version: string; category: string }> {
+  const form = new FormData()
+  form.append('file', file)
+  const params = projectPath ? `?project_path=${encodeURIComponent(projectPath)}` : ''
+  const { data } = await api.post(`/nodes/import${params}`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60_000,
+  })
+  return data
+}
+
+export async function exportNodePackage(nodeId: string): Promise<Blob> {
+  const { data } = await api.get(`/nodes/export/${nodeId}`, { responseType: 'blob' })
+  return data
+}

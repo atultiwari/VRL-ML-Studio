@@ -26,7 +26,7 @@ export function App() {
   const [view, setView] = useState<View>('dashboard')
   const [exportOpen, setExportOpen] = useState(false)
 
-  const { manifests, loading, error } = useNodeRegistry()
+  const { manifests, loading, error, refresh: refreshNodes } = useNodeRegistry()
   const { executePipeline }           = useWebSocket()
   const selectedNodeId                = useUIStore(s => s.selectedNodeId)
   const outputNodeId                  = useExecutionStore(s => s.outputPanelNodeId)
@@ -139,7 +139,7 @@ export function App() {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex flex-1 overflow-hidden">
-          <Sidebar manifests={manifests} loading={loading} error={error} />
+          <Sidebar manifests={manifests} loading={loading} error={error} onRefresh={refreshNodes} />
           <Canvas manifests={manifests} />
           {selectedNodeId && <ParamPanel />}
           {historyOpen && <HistoryPanel onRestore={handleRestore} />}

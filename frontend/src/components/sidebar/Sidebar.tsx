@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ChevronDown,
   ChevronRight,
@@ -6,6 +6,7 @@ import {
   FlaskConical,
   LayoutGrid,
   Loader2,
+  PackagePlus,
   Search,
   Sliders,
   TrendingUp,
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { CATEGORY_GROUPS } from '@/lib/types'
 import type { NodeManifestWithUI } from '@/lib/types'
 import { NodeLibraryItem } from './NodeLibraryItem'
+import { importNodePackage } from '@/lib/api'
 
 // Icon mapping for each category group label
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -31,11 +33,37 @@ interface SidebarProps {
   manifests: NodeManifestWithUI[]
   loading: boolean
   error: string | null
+  onRefresh?: () => void
 }
 
-export function Sidebar({ manifests, loading, error }: SidebarProps) {
+export function Sidebar({ manifests, loading, error, onRefresh }: SidebarProps) {
   const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setImporting(true)
+    setImportError(null)
+
+    try {
+      await importNodePackage(file)
+      onRefresh?.()
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed')
+    } finally {
+      setImporting(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }, [onRefresh])
 
   const toggle = (label: string) =>
     setCollapsed(prev => ({ ...prev, [label]: !prev[label] }))
@@ -74,8 +102,36 @@ export function Sidebar({ manifests, loading, error }: SidebarProps) {
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Node Library
         </span>
-        {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+        <div className="flex items-center gap-1.5">
+          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+          <button
+            onClick={handleImportClick}
+            disabled={importing}
+            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Import .vrlnode package"
+          >
+            {importing
+              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              : <PackagePlus className="h-3.5 w-3.5" />
+            }
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".vrlnode,.zip"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
       </div>
+
+      {/* Import error toast */}
+      {importError && (
+        <div className="mx-3 mt-2 rounded-md bg-destructive/10 px-2.5 py-1.5 text-[10px] text-destructive">
+          {importError}
+          <button onClick={() => setImportError(null)} className="ml-1.5 font-bold">x</button>
+        </div>
+      )}
 
       {/* Search */}
       <div className="border-b border-border px-3 py-2">
