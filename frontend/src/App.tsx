@@ -5,6 +5,8 @@ import { ParamPanel } from '@/components/panel/ParamPanel'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import { ExportDialog } from '@/components/toolbar/ExportDialog'
+import { KeyboardShortcutsPanel } from '@/components/ui/KeyboardShortcutsPanel'
+import { OnboardingTour } from '@/components/ui/OnboardingTour'
 import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
 import { checkHealth } from '@/lib/api'
@@ -25,6 +27,7 @@ export function App() {
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
   const [view, setView] = useState<View>('dashboard')
   const [exportOpen, setExportOpen] = useState(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
   const { manifests, loading, error, refresh: refreshNodes } = useNodeRegistry()
   const { executePipeline }           = useWebSocket()
@@ -44,6 +47,12 @@ export function App() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // ? key toggles shortcuts panel (any view, no modifier needed)
+      if (e.key === '?' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault()
+        setShortcutsOpen(prev => !prev)
+        return
+      }
       if (view !== 'canvas') return
       const mod = e.metaKey || e.ctrlKey
       if (!mod) return
@@ -154,6 +163,13 @@ export function App() {
         pipeline={toPipelineJSON()}
         pipelineName={currentProject?.name ?? 'Untitled Pipeline'}
       />
+
+      <KeyboardShortcutsPanel
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
+      />
+
+      <OnboardingTour />
     </div>
   )
 }
