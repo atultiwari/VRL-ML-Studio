@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.precision_recall_curve",
-  "name": "Precision-Recall Curve",
+  "name": "Performance Curve",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "evaluation.classification",

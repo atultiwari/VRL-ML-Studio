@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.feature_selector",
-  "name": "Feature Selector",
+  "name": "Select Columns",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

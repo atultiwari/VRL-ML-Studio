@@ -1,4 +1,4 @@
-"""XGBoost Classifier node — trains an XGBoost gradient boosted tree classifier."""
+"""XGBoost node — trains an XGBoost gradient boosted tree classifier."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

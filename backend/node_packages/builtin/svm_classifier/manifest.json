@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.svm_classifier",
-  "name": "SVM Classifier",
+  "name": "SVM",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

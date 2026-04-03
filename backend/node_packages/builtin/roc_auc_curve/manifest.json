@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.roc_auc_curve",
-  "name": "ROC-AUC Curve",
+  "name": "ROC Analysis",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "evaluation.classification",

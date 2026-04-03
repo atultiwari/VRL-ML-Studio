@@ -1,4 +1,4 @@
-"""Code snippet for Feature Scaler node."""
+"""Code snippet for Preprocess node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

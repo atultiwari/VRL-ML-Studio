@@ -1,4 +1,4 @@
-"""Code snippet for XGBoost Classifier node."""
+"""Code snippet for XGBoost node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

@@ -4,7 +4,7 @@ import type { NodeManifestWithUI } from '@/lib/types'
 
 const mockManifest: NodeManifestWithUI = {
   id: 'vrl.core.csv_loader',
-  name: 'CSV Loader',
+  name: 'CSV File Import',
   version: '1.0.0',
   category: 'data.input',
   description: 'Load a CSV file',
@@ -22,7 +22,7 @@ const mockManifest: NodeManifestWithUI = {
 const mockManifest2: NodeManifestWithUI = {
   ...mockManifest,
   id: 'vrl.core.data_profiler',
-  name: 'Data Profiler',
+  name: 'Data Info',
   category: 'data.eda',
   inputs: [{ id: 'dataframe_in', type: 'DataFrame', label: 'Input' }],
   outputs: [
@@ -53,7 +53,7 @@ describe('pipelineStore', () => {
       expect(nodes).toHaveLength(1)
       expect(nodes[0].position).toEqual({ x: 100, y: 200 })
       expect(nodes[0].data.manifest.id).toBe('vrl.core.csv_loader')
-      expect(nodes[0].data.label).toBe('CSV Loader')
+      expect(nodes[0].data.label).toBe('CSV File Import')
       expect(nodes[0].data.status).toBe('idle')
       expect(nodes[0].data.parameters).toEqual({})
       expect(nodes[0].type).toBe('vrlNode')
@@ -177,7 +177,7 @@ describe('pipelineStore', () => {
       expect(json.nodes).toHaveLength(1)
       expect(json.nodes[0].type).toBe('vrl.core.csv_loader')
       expect(json.nodes[0].position).toEqual({ x: 50, y: 100 })
-      expect(json.nodes[0].label).toBe('CSV Loader')
+      expect(json.nodes[0].label).toBe('CSV File Import')
     })
 
     it('serializes edges correctly', () => {

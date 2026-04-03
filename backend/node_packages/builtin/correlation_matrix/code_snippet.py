@@ -1,4 +1,4 @@
-"""Code snippet for Correlation Matrix node."""
+"""Code snippet for Correlations node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

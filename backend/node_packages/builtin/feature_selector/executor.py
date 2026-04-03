@@ -1,4 +1,4 @@
-"""Feature Selector node — selects features manually, by variance, or by correlation."""
+"""Select Columns node — selects features manually, by variance, or by correlation."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

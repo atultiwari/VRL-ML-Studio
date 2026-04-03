@@ -1,4 +1,4 @@
-"""Classification Report node — computes precision, recall, F1, and accuracy."""
+"""Test & Score node — computes precision, recall, F1, and accuracy."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

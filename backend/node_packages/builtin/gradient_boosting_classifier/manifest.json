@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.gradient_boosting_classifier",
-  "name": "Gradient Boosting Classifier",
+  "name": "Gradient Boosting",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

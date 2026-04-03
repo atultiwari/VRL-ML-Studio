@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.random_forest_regressor",
-  "name": "Random Forest Regressor",
+  "name": "Random Forest (Regressor)",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.regression",

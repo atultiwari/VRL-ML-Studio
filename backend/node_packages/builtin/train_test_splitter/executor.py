@@ -1,4 +1,4 @@
-"""Train-Test Splitter node — splits a DataFrame into train and test subsets."""
+"""Data Sampler node — splits a DataFrame into train and test subsets."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

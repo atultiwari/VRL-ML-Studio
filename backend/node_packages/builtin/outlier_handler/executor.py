@@ -1,4 +1,4 @@
-"""Outlier Handler node — detect and handle outliers via IQR or Z-score."""
+"""Outliers node — detect and handle outliers via IQR or Z-score."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

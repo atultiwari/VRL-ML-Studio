@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.knn_regressor",
-  "name": "KNN Regressor",
+  "name": "kNN (Regressor)",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.regression",

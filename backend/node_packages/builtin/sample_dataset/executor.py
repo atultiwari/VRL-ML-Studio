@@ -1,4 +1,4 @@
-"""Sample Dataset node — loads one of the built-in sklearn/seaborn datasets."""
+"""Datasets node — loads one of the built-in sklearn/seaborn datasets."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

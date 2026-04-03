@@ -1,4 +1,4 @@
-"""Gradient Boosting Classifier node — trains a gradient boosted ensemble."""
+"""Gradient Boosting node — trains a gradient boosted ensemble."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

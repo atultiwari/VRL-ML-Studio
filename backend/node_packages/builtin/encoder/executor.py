@@ -1,4 +1,4 @@
-"""Encoder node — encodes categorical columns using one-hot, label, or ordinal encoding."""
+"""Continuize node — encodes categorical columns using one-hot, label, or ordinal encoding."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

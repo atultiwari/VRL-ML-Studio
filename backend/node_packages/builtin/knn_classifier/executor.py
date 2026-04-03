@@ -1,4 +1,4 @@
-"""K-Nearest Neighbors node — trains a KNN classifier."""
+"""kNN node — trains a KNN classifier."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

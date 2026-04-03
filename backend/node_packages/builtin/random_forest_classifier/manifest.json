@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.random_forest_classifier",
-  "name": "Random Forest Classifier",
+  "name": "Random Forest",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

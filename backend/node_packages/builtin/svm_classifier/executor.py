@@ -1,4 +1,4 @@
-"""SVM Classifier node — trains a Support Vector Machine with probability estimates."""
+"""SVM node — trains a Support Vector Machine with probability estimates."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

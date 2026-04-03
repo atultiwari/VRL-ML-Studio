@@ -1,4 +1,4 @@
-"""Missing Value Imputer node — fills missing values using sklearn SimpleImputer."""
+"""Impute node — fills missing values using sklearn SimpleImputer."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

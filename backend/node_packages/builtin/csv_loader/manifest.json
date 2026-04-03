@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.csv_loader",
-  "name": "CSV Loader",
+  "name": "CSV File Import",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "data.input",

@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.type_caster",
-  "name": "Type Caster",
+  "name": "Edit Domain",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

@@ -1,4 +1,4 @@
-"""Feature Scaler node — scales numeric columns using standard, min-max, or robust scaling."""
+"""Preprocess node — scales numeric columns using standard, min-max, or robust scaling."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

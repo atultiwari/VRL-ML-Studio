@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.xgboost_regressor",
-  "name": "XGBoost Regressor",
+  "name": "XGBoost (Regressor)",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.regression",

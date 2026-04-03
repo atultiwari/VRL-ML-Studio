@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.data_profiler",
-  "name": "Data Profiler",
+  "name": "Data Info",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "data.eda",

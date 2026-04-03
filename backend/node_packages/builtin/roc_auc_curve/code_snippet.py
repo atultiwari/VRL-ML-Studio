@@ -1,4 +1,4 @@
-"""Code snippet for ROC-AUC Curve node."""
+"""Code snippet for ROC Analysis node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

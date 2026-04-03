@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.xgboost_classifier",
-  "name": "XGBoost Classifier",
+  "name": "XGBoost",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

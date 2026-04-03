@@ -1,4 +1,4 @@
-"""Random Forest Regressor node — trains an ensemble of decision trees for regression."""
+"""Random Forest (Regressor) node — trains an ensemble of decision trees for regression."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

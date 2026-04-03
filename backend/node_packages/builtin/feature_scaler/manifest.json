@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.feature_scaler",
-  "name": "Feature Scaler",
+  "name": "Preprocess",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

@@ -1,4 +1,4 @@
-"""Code snippet for Random Forest Classifier node."""
+"""Code snippet for Random Forest node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

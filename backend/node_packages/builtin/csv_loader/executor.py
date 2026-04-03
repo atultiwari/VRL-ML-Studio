@@ -1,4 +1,4 @@
-"""CSV Loader node — reads a CSV/TSV file from an uploaded path."""
+"""CSV File Import node — reads a CSV/TSV file from an uploaded path."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

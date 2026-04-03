@@ -1,4 +1,4 @@
-"""ROC-AUC Curve node — plots the ROC curve and computes AUC for binary and multiclass."""
+"""ROC Analysis node — plots the ROC curve and computes AUC for binary and multiclass."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

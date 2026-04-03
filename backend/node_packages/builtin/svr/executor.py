@@ -1,4 +1,4 @@
-"""Support Vector Regressor node — trains an SVR model for regression tasks."""
+"""SVR node — trains an SVR model for regression tasks."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

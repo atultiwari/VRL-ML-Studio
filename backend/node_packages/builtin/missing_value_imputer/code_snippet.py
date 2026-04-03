@@ -1,4 +1,4 @@
-"""Code snippet for Missing Value Imputer node."""
+"""Code snippet for Impute node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

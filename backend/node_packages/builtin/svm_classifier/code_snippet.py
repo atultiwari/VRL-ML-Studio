@@ -1,4 +1,4 @@
-"""Code snippet for SVM Classifier node."""
+"""Code snippet for SVM node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

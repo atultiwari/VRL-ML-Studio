@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.encoder",
-  "name": "Encoder",
+  "name": "Continuize",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

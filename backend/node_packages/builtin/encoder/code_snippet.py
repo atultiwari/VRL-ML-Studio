@@ -1,4 +1,4 @@
-"""Code snippet for Encoder node."""
+"""Code snippet for Continuize node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

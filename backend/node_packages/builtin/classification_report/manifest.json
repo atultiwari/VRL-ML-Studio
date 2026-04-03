@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.classification_report",
-  "name": "Classification Report",
+  "name": "Test & Score",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "evaluation.classification",

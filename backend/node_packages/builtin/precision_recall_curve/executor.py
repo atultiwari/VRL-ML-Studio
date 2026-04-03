@@ -1,4 +1,4 @@
-"""Precision-Recall Curve node — plots precision vs recall for binary and multiclass."""
+"""Performance Curve node — plots precision vs recall for binary and multiclass."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

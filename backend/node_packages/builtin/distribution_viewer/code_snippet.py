@@ -1,4 +1,4 @@
-"""Code snippet for Distribution Viewer node."""
+"""Code snippet for Distributions node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

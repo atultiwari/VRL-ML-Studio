@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.train_test_splitter",
-  "name": "Train-Test Splitter",
+  "name": "Data Sampler",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

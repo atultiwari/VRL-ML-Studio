@@ -1,4 +1,4 @@
-"""Code snippet for Sample Dataset node."""
+"""Code snippet for Datasets node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

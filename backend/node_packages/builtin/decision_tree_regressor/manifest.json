@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.decision_tree_regressor",
-  "name": "Decision Tree Regressor",
+  "name": "Tree (Regressor)",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.regression",

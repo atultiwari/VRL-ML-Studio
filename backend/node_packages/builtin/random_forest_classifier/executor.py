@@ -1,4 +1,4 @@
-"""Random Forest Classifier node — trains an ensemble of decision trees."""
+"""Random Forest node — trains an ensemble of decision trees."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

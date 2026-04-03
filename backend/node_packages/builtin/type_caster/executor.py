@@ -1,4 +1,4 @@
-"""Type Caster node — cast a column to a specified data type."""
+"""Edit Domain node — cast a column to a specified data type."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

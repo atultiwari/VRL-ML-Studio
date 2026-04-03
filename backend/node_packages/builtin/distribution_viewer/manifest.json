@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.distribution_viewer",
-  "name": "Distribution Viewer",
+  "name": "Distributions",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "data.eda",

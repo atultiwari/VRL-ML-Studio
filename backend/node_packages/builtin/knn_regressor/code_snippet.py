@@ -1,4 +1,4 @@
-"""Code snippet for KNN Regressor node."""
+"""Code snippet for kNN (Regressor) node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

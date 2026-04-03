@@ -1,4 +1,4 @@
-"""Code snippet for Duplicate Remover node."""
+"""Code snippet for Unique node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

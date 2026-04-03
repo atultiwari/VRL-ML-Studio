@@ -1,4 +1,4 @@
-"""Decision Tree Classifier node — trains a decision tree for classification."""
+"""Tree node — trains a decision tree for classification."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

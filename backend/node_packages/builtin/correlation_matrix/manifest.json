@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.correlation_matrix",
-  "name": "Correlation Matrix",
+  "name": "Correlations",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "data.eda",

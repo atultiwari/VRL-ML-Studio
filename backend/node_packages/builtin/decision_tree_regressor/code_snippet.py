@@ -1,4 +1,4 @@
-"""Code snippet for Decision Tree Regressor node."""
+"""Code snippet for Tree (Regressor) node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

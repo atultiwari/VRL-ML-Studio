@@ -1,4 +1,4 @@
-"""Decision Tree Regressor node — trains a decision tree for regression tasks."""
+"""Tree (Regressor) node — trains a decision tree for regression tasks."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

@@ -1,4 +1,4 @@
-"""Duplicate Remover node — drop duplicate rows from a DataFrame."""
+"""Unique node — drop duplicate rows from a DataFrame."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

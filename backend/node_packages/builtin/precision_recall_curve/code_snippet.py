@@ -1,4 +1,4 @@
-"""Code snippet for Precision-Recall Curve node."""
+"""Code snippet for Performance Curve node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

@@ -1,4 +1,4 @@
-"""KNN Regressor node — trains a k-nearest neighbors model for regression tasks."""
+"""kNN (Regressor) node — trains a k-nearest neighbors model for regression tasks."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

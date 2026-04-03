@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.sample_dataset",
-  "name": "Sample Dataset",
+  "name": "Datasets",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "data.input",

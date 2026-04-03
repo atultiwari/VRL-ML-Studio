@@ -31,7 +31,7 @@ def df_clean() -> pd.DataFrame:
 CTX: dict = {}
 
 
-# ── Missing Value Imputer ────────────────────────────────────────────────────
+# ── Impute ──────────────────────────────────────────────────────────────────
 
 
 class TestMissingValueImputer:
@@ -102,7 +102,7 @@ class TestEncoder:
         assert out["gender"].dtype == object  # untouched
 
 
-# ── Feature Scaler ───────────────────────────────────────────────────────────
+# ── Preprocess ───────────────────────────────────────────────────────────────
 
 
 class TestFeatureScaler:
@@ -135,7 +135,7 @@ class TestFeatureScaler:
         pd.testing.assert_series_equal(out["salary"], original_salary)
 
 
-# ── Feature Selector ─────────────────────────────────────────────────────────
+# ── Select Columns ───────────────────────────────────────────────────────────
 
 
 class TestFeatureSelector:
@@ -154,7 +154,7 @@ class TestFeatureSelector:
         assert result["dataframe_out"].shape[1] > 0
 
 
-# ── Train-Test Splitter ──────────────────────────────────────────────────────
+# ── Data Sampler ─────────────────────────────────────────────────────────────
 
 
 class TestTrainTestSplitter:
@@ -186,7 +186,7 @@ class TestTrainTestSplitter:
         assert sd["train"].shape[0] + sd["test"].shape[0] == df_clean.shape[0]
 
 
-# ── Outlier Handler ──────────────────────────────────────────────────────────
+# ── Outliers ─────────────────────────────────────────────────────────────────
 
 
 class TestOutlierHandler:
@@ -233,7 +233,7 @@ class TestColumnDropper:
             self._exec(df_clean.copy(), columns=[])
 
 
-# ── Type Caster ──────────────────────────────────────────────────────────────
+# ── Edit Domain ──────────────────────────────────────────────────────────────
 
 
 class TestTypeCaster:
@@ -255,7 +255,7 @@ class TestTypeCaster:
         assert result["dataframe_out"]["city"].dtype.name == "category"
 
 
-# ── Duplicate Remover ────────────────────────────────────────────────────────
+# ── Unique ───────────────────────────────────────────────────────────────────
 
 
 class TestDuplicateRemover:

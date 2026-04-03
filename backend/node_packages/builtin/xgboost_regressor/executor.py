@@ -1,4 +1,4 @@
-"""XGBoost Regressor node — trains a gradient boosted tree model for regression."""
+"""XGBoost (Regressor) node — trains a gradient boosted tree model for regression."""
 
 
 def execute(inputs: dict, parameters: dict, context: dict) -> dict:

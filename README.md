@@ -45,13 +45,13 @@ Then open http://localhost:3000
 ## Your First Pipeline (Titanic Classification)
 
 1. **Create a project** — Click "New Project" on the dashboard, name it "Titanic Classification"
-2. **Load data** — Drag "Sample Dataset" from the sidebar, select "titanic" in its parameters
-3. **Handle missing values** — Drag "Missing Value Imputer", connect it, set strategy to "median"
-4. **Encode categories** — Drag "Encoder", connect it, set method to "onehot"
-5. **Scale features** — Drag "Feature Scaler", connect it, set method to "standard"
-6. **Split data** — Drag "Train-Test Splitter", connect it, set target column to "Survived"
-7. **Train model** — Drag "Random Forest Classifier", connect to the splitter output
-8. **Evaluate** — Drag "Classification Report" and "Confusion Matrix", connect both to the model
+2. **Load data** — Drag "Datasets" from the sidebar, select "titanic" in its parameters
+3. **Handle missing values** — Drag "Impute", connect it, set strategy to "median"
+4. **Encode categories** — Drag "Continuize", connect it, set method to "onehot"
+5. **Scale features** — Drag "Preprocess", connect it, set method to "standard"
+6. **Split data** — Drag "Data Sampler", connect it, set target column to "Survived"
+7. **Train model** — Drag "Random Forest", connect to the splitter output
+8. **Evaluate** — Drag "Test & Score" and "Confusion Matrix", connect both to the model
 9. **Run** — Click the Run button (or press the play icon in the toolbar)
 10. **View results** — Double-click any completed node to see its output
 
@@ -124,13 +124,13 @@ Built-in nodes live in `backend/node_packages/builtin/`. Custom nodes can be imp
 
 | Category | Nodes |
 |---|---|
-| **Data Input** (4) | CSV Loader, Excel Loader, Sample Dataset, Manual Data Entry |
-| **Exploration** (5) | Data Profiler, Distribution Viewer, Correlation Matrix, Scatter Plot, Box Plot |
-| **Preprocessing** (9) | Missing Value Imputer, Encoder, Feature Scaler, Feature Selector, Train-Test Splitter, Outlier Handler, Column Dropper, Type Caster, Duplicate Remover |
-| **Classification** (8) | Logistic Regression, Decision Tree, Random Forest, XGBoost, SVM, KNN, Naive Bayes, Gradient Boosting |
-| **Regression** (9) | Linear, Ridge, Lasso, ElasticNet, Decision Tree, Random Forest, XGBoost, SVR, KNN |
+| **Data Input** (4) | CSV File Import, Excel Loader, Datasets, Manual Data Entry |
+| **Exploration** (5) | Data Info, Distributions, Correlations, Scatter Plot, Box Plot |
+| **Preprocessing** (9) | Impute, Continuize, Preprocess, Select Columns, Data Sampler, Outliers, Column Dropper, Edit Domain, Unique |
+| **Classification** (8) | Logistic Regression, Tree, Random Forest, XGBoost, SVM, kNN, Naive Bayes, Gradient Boosting |
+| **Regression** (9) | Linear Regression, Ridge, Lasso, ElasticNet, Tree (Regressor), Random Forest (Regressor), XGBoost (Regressor), SVR, kNN (Regressor) |
 | **Unsupervised** (5) | K-Means, Hierarchical Clustering, DBSCAN, PCA, t-SNE |
-| **Evaluation** (12) | Classification Report, Confusion Matrix, ROC-AUC Curve, Precision-Recall Curve, Feature Importance, Regression Report, Residual Plot, Actual vs Predicted, Cluster Report, Cluster Visualization, Elbow Plot |
+| **Evaluation** (12) | Test & Score, Confusion Matrix, ROC Analysis, Performance Curve, Feature Importance, Regression Report, Residual Plot, Actual vs Predicted, Cluster Report, Cluster Visualization, Elbow Plot |
 
 ---
 

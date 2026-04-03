@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.knn_classifier",
-  "name": "K-Nearest Neighbors",
+  "name": "kNN",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.duplicate_remover",
-  "name": "Duplicate Remover",
+  "name": "Unique",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

@@ -1,4 +1,4 @@
-"""Code snippet for Train-Test Splitter node."""
+"""Code snippet for Data Sampler node."""
 
 
 def get_snippet(params: dict, input_vars: dict, output_vars: dict, label: str):

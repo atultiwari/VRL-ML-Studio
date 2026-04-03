@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.decision_tree_classifier",
-  "name": "Decision Tree Classifier",
+  "name": "Tree",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "model.classification",

@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.outlier_handler",
-  "name": "Outlier Handler",
+  "name": "Outliers",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",

@@ -1,6 +1,6 @@
 {
   "id": "vrl.core.missing_value_imputer",
-  "name": "Missing Value Imputer",
+  "name": "Impute",
   "version": "1.0.0",
   "author": "VRL ML Studio",
   "category": "preprocessing",
