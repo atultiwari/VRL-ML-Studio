@@ -1,24 +1,67 @@
-import { Database, FlaskConical, LayoutGrid, Search, Sliders, TrendingUp } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import {
+  ChevronDown,
+  ChevronRight,
+  Database,
+  FlaskConical,
+  LayoutGrid,
+  Loader2,
+  Search,
+  Sliders,
+  TrendingUp,
+  WifiOff,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CATEGORY_GROUPS } from '@/lib/types'
+import type { NodeManifestWithUI } from '@/lib/types'
+import { NodeLibraryItem } from './NodeLibraryItem'
 
-interface CategoryItem {
-  icon: React.ReactNode
-  label: string
-  count: number
-  color: string
+// Icon mapping for each category group label
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  'Data Input':     <Database    className="h-3.5 w-3.5" />,
+  'Exploration':    <Search      className="h-3.5 w-3.5" />,
+  'Preprocessing':  <Sliders     className="h-3.5 w-3.5" />,
+  'Classification': <TrendingUp  className="h-3.5 w-3.5" />,
+  'Regression':     <TrendingUp  className="h-3.5 w-3.5" />,
+  'Unsupervised':   <LayoutGrid  className="h-3.5 w-3.5" />,
+  'Evaluation':     <FlaskConical className="h-3.5 w-3.5" />,
 }
 
-const CATEGORIES: CategoryItem[] = [
-  { icon: <Database className="h-3.5 w-3.5" />,     label: 'Data Input',       count: 4,  color: 'text-blue-400' },
-  { icon: <Search className="h-3.5 w-3.5" />,       label: 'Exploration',      count: 5,  color: 'text-purple-400' },
-  { icon: <Sliders className="h-3.5 w-3.5" />,      label: 'Preprocessing',    count: 9,  color: 'text-amber-400' },
-  { icon: <TrendingUp className="h-3.5 w-3.5" />,   label: 'Classification',   count: 8,  color: 'text-emerald-400' },
-  { icon: <TrendingUp className="h-3.5 w-3.5" />,   label: 'Regression',       count: 9,  color: 'text-cyan-400' },
-  { icon: <LayoutGrid className="h-3.5 w-3.5" />,   label: 'Unsupervised',     count: 5,  color: 'text-rose-400' },
-  { icon: <FlaskConical className="h-3.5 w-3.5" />, label: 'Evaluation',       count: 11, color: 'text-orange-400' },
-]
+interface SidebarProps {
+  manifests: NodeManifestWithUI[]
+  loading: boolean
+  error: string | null
+}
 
-export function Sidebar() {
+export function Sidebar({ manifests, loading, error }: SidebarProps) {
+  const [query, setQuery] = useState('')
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+
+  const toggle = (label: string) =>
+    setCollapsed(prev => ({ ...prev, [label]: !prev[label] }))
+
+  // Group manifests by category group
+  const grouped = useMemo(() => {
+    const lq = query.toLowerCase()
+    return CATEGORY_GROUPS.map(group => {
+      const nodes = manifests.filter(
+        m =>
+          group.prefixes.some(p => m.category === p || m.category.startsWith(p)) &&
+          (!lq || m.name.toLowerCase().includes(lq) || m.description.toLowerCase().includes(lq))
+      )
+      return { ...group, nodes }
+    })
+  }, [manifests, query])
+
+  // Search result flat list
+  const searchResults = useMemo(() => {
+    if (!query) return null
+    const lq = query.toLowerCase()
+    return manifests.filter(
+      m => m.name.toLowerCase().includes(lq) || m.description.toLowerCase().includes(lq)
+    )
+  }, [manifests, query])
+
   return (
     <aside
       className={cn(
@@ -31,49 +74,113 @@ export function Sidebar() {
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Node Library
         </span>
+        {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
       </div>
 
-      {/* Search (Stage 2+) */}
+      {/* Search */}
       <div className="border-b border-border px-3 py-2">
-        <div className="flex h-8 items-center gap-2 rounded-md bg-muted px-2.5">
+        <label className="flex h-8 items-center gap-2 rounded-md bg-muted px-2.5">
           <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Search nodes… (/)</span>
-        </div>
+          <input
+            type="text"
+            placeholder="Search nodes… (/)"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none"
+          />
+        </label>
       </div>
 
-      {/* Categories */}
+      {/* Content */}
       <nav className="flex-1 overflow-y-auto py-2">
-        <ul className="space-y-0.5 px-2">
-          {CATEGORIES.map((cat) => (
-            <li key={cat.label}>
-              <button
-                disabled
-                className={cn(
-                  'flex w-full items-center justify-between rounded-md px-2.5 py-2',
-                  'text-sm text-muted-foreground',
-                  'opacity-60 cursor-not-allowed',
-                  'hover:bg-muted/50 transition-colors'
+        {error ? (
+          <div className="flex flex-col items-center gap-2 px-3 py-6 text-center">
+            <WifiOff className="h-6 w-6 text-muted-foreground/50" />
+            <p className="text-xs text-muted-foreground">
+              Could not load nodes.<br />Is the backend running?
+            </p>
+          </div>
+        ) : loading ? (
+          <div className="flex flex-col gap-1 px-2">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="h-8 animate-pulse rounded-md bg-muted/50"
+                style={{ animationDelay: `${i * 80}ms` }}
+              />
+            ))}
+          </div>
+        ) : searchResults !== null ? (
+          /* Flat search results */
+          <ul className="space-y-0.5 px-2">
+            {searchResults.length === 0 ? (
+              <li className="px-2 py-4 text-center text-xs text-muted-foreground">
+                No nodes match "{query}"
+              </li>
+            ) : (
+              searchResults.map(m => (
+                <li key={m.id}>
+                  <NodeLibraryItem manifest={m} />
+                </li>
+              ))
+            )}
+          </ul>
+        ) : (
+          /* Categorised view */
+          <ul className="space-y-0.5 px-2">
+            {grouped.map(group => (
+              <li key={group.label}>
+                {/* Category header */}
+                <button
+                  onClick={() => toggle(group.label)}
+                  disabled={group.nodes.length === 0}
+                  className={cn(
+                    'flex w-full items-center justify-between rounded-md px-2.5 py-2',
+                    'text-xs transition-colors',
+                    group.nodes.length > 0
+                      ? 'cursor-pointer text-foreground hover:bg-muted/50'
+                      : 'cursor-default text-muted-foreground/60'
+                  )}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className={group.colorClass}>
+                      {CATEGORY_ICONS[group.label]}
+                    </span>
+                    <span className="font-medium">{group.label}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {group.nodes.length}
+                    </span>
+                    {group.nodes.length > 0 && (
+                      collapsed[group.label]
+                        ? <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                        : <ChevronDown  className="h-3 w-3 text-muted-foreground" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Node list */}
+                {!collapsed[group.label] && group.nodes.length > 0 && (
+                  <ul className="mt-0.5 space-y-0.5 pl-1">
+                    {group.nodes.map(m => (
+                      <li key={m.id}>
+                        <NodeLibraryItem manifest={m} />
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className={cat.color}>{cat.icon}</span>
-                  <span>{cat.label}</span>
-                </div>
-                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  {cat.count}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
       </nav>
 
       {/* Footer hint */}
       <div className="border-t border-border px-3 py-2.5">
         <p className="text-[10px] leading-relaxed text-muted-foreground">
           Drag nodes onto the canvas to build your pipeline.
-          <br />
-          <span className="text-primary/70">Stage 2</span> — canvas coming soon.
+          Connect output → input ports of the same type.
         </p>
       </div>
     </aside>

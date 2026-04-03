@@ -26,6 +26,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("VRL ML Studio backend starting up (v%s)", settings.vrl_studio_version)
     registry.load_builtin_packages()
+    app.state.registry = registry  # expose to routers via request.app.state
     logger.info("Node registry ready — %d nodes loaded", len(registry))
     yield
     # Shutdown

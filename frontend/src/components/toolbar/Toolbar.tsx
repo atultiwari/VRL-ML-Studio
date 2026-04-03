@@ -2,6 +2,7 @@ import { Activity, GitBranch, Play, Save, Upload, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { usePipelineStore } from '@/store/pipelineStore'
 
 interface ToolbarProps {
   backendStatus: 'connecting' | 'online' | 'offline'
@@ -9,6 +10,11 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ backendStatus, nodesLoaded }: ToolbarProps) {
+  const undo    = usePipelineStore(s => s.undo)
+  const redo    = usePipelineStore(s => s.redo)
+  const canUndo = usePipelineStore(s => s.past.length > 0)
+  const canRedo = usePipelineStore(s => s.future.length > 0)
+
   const statusVariant =
     backendStatus === 'online'
       ? 'success'
@@ -49,14 +55,26 @@ export function Toolbar({ backendStatus, nodesLoaded }: ToolbarProps) {
         </Badge>
       </div>
 
-      {/* ── Centre: Pipeline actions (Stage 2+) ── */}
+      {/* ── Centre: Pipeline actions ── */}
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" disabled title="Undo (Ctrl+Z)">
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canUndo}
+          onClick={undo}
+          title="Undo (Ctrl+Z)"
+        >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M3 7v6h6" /><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
           </svg>
         </Button>
-        <Button variant="ghost" size="icon" disabled title="Redo (Ctrl+Y)">
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canRedo}
+          onClick={redo}
+          title="Redo (Ctrl+Y)"
+        >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" />
           </svg>

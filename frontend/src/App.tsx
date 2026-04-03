@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
-import { CanvasPlaceholder } from '@/components/canvas/CanvasPlaceholder'
+import { useCallback, useEffect, useState } from 'react'
+import { Canvas } from '@/components/canvas/Canvas'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import { checkHealth } from '@/lib/api'
+import { useNodeRegistry } from '@/hooks/useNodeRegistry'
+import { usePipelineStore } from '@/store/pipelineStore'
 
 type BackendStatus = 'connecting' | 'online' | 'offline'
 
@@ -10,6 +12,28 @@ export function App() {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('connecting')
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
 
+  const { manifests, loading, error } = useNodeRegistry()
+
+  // Keyboard shortcuts for undo/redo
+  const undo = usePipelineStore(s => s.undo)
+  const redo = usePipelineStore(s => s.redo)
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod) return
+      if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
+      if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); redo() }
+    },
+    [undo, redo]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  // Backend health polling
   useEffect(() => {
     let cancelled = false
 
@@ -21,20 +45,13 @@ export function App() {
           setNodesLoaded(data.nodes_loaded)
         }
       } catch {
-        if (!cancelled) {
-          setBackendStatus('offline')
-        }
+        if (!cancelled) setBackendStatus('offline')
       }
     }
 
     ping()
-
-    // Re-check every 30 seconds
     const interval = setInterval(ping, 30_000)
-    return () => {
-      cancelled = true
-      clearInterval(interval)
-    }
+    return () => { cancelled = true; clearInterval(interval) }
   }, [])
 
   return (
@@ -42,8 +59,8 @@ export function App() {
       <Toolbar backendStatus={backendStatus} nodesLoaded={nodesLoaded} />
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <CanvasPlaceholder />
+        <Sidebar manifests={manifests} loading={loading} error={error} />
+        <Canvas manifests={manifests} />
       </div>
     </div>
   )

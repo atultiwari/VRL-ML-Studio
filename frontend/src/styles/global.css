@@ -106,11 +106,25 @@
 .react-flow__handle {
   width: 10px !important;
   height: 10px !important;
-  border: 2px solid hsl(var(--border)) !important;
-  background: hsl(var(--card)) !important;
+  border-width: 2px !important;
   transition: border-color 150ms, background-color 150ms;
 }
-.react-flow__handle:hover {
-  border-color: hsl(var(--accent)) !important;
-  background: hsl(var(--accent)) !important;
+.react-flow__handle.connectable:hover {
+  opacity: 0.9;
+}
+
+/* React Flow controls panel */
+.react-flow__controls {
+  box-shadow: none !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+}
+.react-flow__controls-button {
+  border-bottom-color: hsl(var(--border)) !important;
+}
+
+/* React Flow minimap */
+.react-flow__minimap {
+  box-shadow: none !important;
 }

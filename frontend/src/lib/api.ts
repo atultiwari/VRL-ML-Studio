@@ -25,3 +25,8 @@ export async function checkHealth(): Promise<{
   const { data } = await api.get('/health')
   return data
 }
+
+export async function getNodes(): Promise<import('./types').NodeManifestWithUI[]> {
+  const { data } = await api.get('/nodes')
+  return data
+}
