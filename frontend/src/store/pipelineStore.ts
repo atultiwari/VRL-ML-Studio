@@ -59,6 +59,9 @@ interface PipelineStore {
   // Serialise to pipeline JSON for execution
   toPipelineJSON: () => import('@/lib/types').PipelineJSON
 
+  // Load from saved JSON (project open / restore)
+  loadPipelineFromJSON: (pipeline: import('@/lib/types').PipelineJSON, manifests: NodeManifestWithUI[]) => void
+
   // Misc
   clearPipeline: () => void
 }
@@ -196,6 +199,46 @@ export const usePipelineStore = create<PipelineStore>()(
             targetPort: e.targetHandle ?? '',
           })),
         }
+      },
+
+      loadPipelineFromJSON: (pipeline, manifests) => {
+        // Reconstruct React Flow nodes from saved pipeline JSON + available manifests
+        const manifestMap = new Map(manifests.map(m => [m.id, m]))
+        const nodes: VrlNode[] = pipeline.nodes
+          .map(n => {
+            const manifest = manifestMap.get(n.type)
+            if (!manifest) return null
+            return {
+              id: n.id,
+              type: 'vrlNode' as const,
+              position: n.position,
+              data: {
+                manifest,
+                parameters: n.parameters ?? {},
+                status: 'idle' as const,
+                label: n.label ?? manifest.name,
+              },
+            } as VrlNode
+          })
+          .filter((n): n is VrlNode => n !== null)
+
+        const edges: Edge[] = pipeline.edges.map(e => {
+          // Look up port type for edge colouring
+          const srcNode = nodes.find(n => n.id === e.source)
+          const srcPort = srcNode?.data.manifest.outputs.find(p => p.id === e.sourcePort)
+          const edgeColor = srcPort ? portColors[srcPort.type] : portColors.DataFrame
+          return {
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            sourceHandle: e.sourcePort,
+            targetHandle: e.targetPort,
+            style: { stroke: edgeColor, strokeWidth: 1.5 },
+            data: { portType: srcPort?.type ?? 'DataFrame' },
+          }
+        })
+
+        set({ nodes, edges, past: [], future: [] })
       },
 
       clearPipeline: () => {

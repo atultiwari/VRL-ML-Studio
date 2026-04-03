@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "template-sample-1",
+      "type": "vrl.core.sample_dataset",
+      "label": "Iris Dataset",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "dataset": "iris"
+      }
+    },
+    {
+      "id": "template-scaler-1",
+      "type": "vrl.core.feature_scaler",
+      "label": "Feature Scaler",
+      "position": { "x": 100, "y": 300 },
+      "parameters": {
+        "method": "standard"
+      }
+    },
+    {
+      "id": "template-kmeans-1",
+      "type": "vrl.core.kmeans",
+      "label": "K-Means Clustering",
+      "position": { "x": 100, "y": 500 },
+      "parameters": {
+        "n_clusters": 3,
+        "init": "k-means++",
+        "max_iter": 300,
+        "random_state": 42
+      }
+    },
+    {
+      "id": "template-clusterreport-1",
+      "type": "vrl.core.cluster_report",
+      "label": "Cluster Report",
+      "position": { "x": 100, "y": 700 },
+      "parameters": {
+        "cluster_col": "cluster"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-sample-scaler",
+      "source": "template-sample-1",
+      "target": "template-scaler-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-scaler-kmeans",
+      "source": "template-scaler-1",
+      "target": "template-kmeans-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-kmeans-clusterreport",
+      "source": "template-kmeans-1",
+      "target": "template-clusterreport-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    }
+  ]
+}

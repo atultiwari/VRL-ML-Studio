@@ -1,23 +1,41 @@
-import { Activity, GitBranch, Loader2, Play, Save, Upload, Zap } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { Activity, FolderOpen, GitBranch, Loader2, Play, Save, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useExecutionStore } from '@/store/executionStore'
+import { useProjectStore } from '@/store/projectStore'
 
 interface ToolbarProps {
   backendStatus: 'connecting' | 'online' | 'offline'
   nodesLoaded?: number
   onRun?: () => void
+  onSave?: () => void
+  onToggleHistory?: () => void
+  onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, onRun }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onToggleHistory, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
   const canRedo    = usePipelineStore(s => s.future.length > 0)
   const nodeCount  = usePipelineStore(s => s.nodes.length)
   const isRunning  = useExecutionStore(s => s.running)
+  const project    = useProjectStore(s => s.currentProject)
+  const historyOpen = useProjectStore(s => s.historyOpen)
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = useCallback(async () => {
+    if (!onSave) return
+    setSaving(true)
+    try {
+      await onSave()
+    } finally {
+      setSaving(false)
+    }
+  }, [onSave])
 
   const statusVariant =
     backendStatus === 'online'
@@ -41,22 +59,33 @@ export function Toolbar({ backendStatus, nodesLoaded, onRun }: ToolbarProps) {
         'shrink-0'
       )}
     >
-      {/* ── Left: Logo ── */}
+      {/* ── Left: Logo + project name ── */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
+        <button
+          onClick={onGoHome}
+          className="flex items-center gap-2 rounded-md p-1 hover:bg-muted transition-colors"
+          title="Projects"
+        >
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/20">
             <Zap className="h-4 w-4 text-primary" />
           </div>
           <span className="font-semibold tracking-tight text-foreground">
             VRL ML Studio
           </span>
-        </div>
+        </button>
 
-        <span className="hidden h-4 w-px bg-border sm:block" />
-
-        <Badge variant="outline" className="hidden sm:inline-flex font-mono text-[10px]">
-          v1.0.0
-        </Badge>
+        {project && (
+          <>
+            <span className="h-4 w-px bg-border" />
+            <div className="flex items-center gap-1.5">
+              <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-foreground">{project.name}</span>
+              <Badge variant="outline" className="font-mono text-[9px]">
+                {project.branch}
+              </Badge>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Centre: Pipeline actions ── */}
@@ -86,17 +115,27 @@ export function Toolbar({ backendStatus, nodesLoaded, onRun }: ToolbarProps) {
 
         <span className="mx-1 h-4 w-px bg-border" />
 
-        <Button variant="ghost" size="sm" disabled className="gap-1.5">
-          <Save className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Save</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={!project || saving}
+          onClick={handleSave}
+          className="gap-1.5"
+        >
+          {saving
+            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : <Save className="h-3.5 w-3.5" />
+          }
+          <span className="hidden sm:inline">{saving ? 'Saving…' : 'Save'}</span>
         </Button>
 
-        <Button variant="ghost" size="sm" disabled className="gap-1.5">
-          <Upload className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Export</span>
-        </Button>
-
-        <Button variant="ghost" size="sm" disabled className="gap-1.5">
+        <Button
+          variant={historyOpen ? 'secondary' : 'ghost'}
+          size="sm"
+          disabled={!project}
+          onClick={onToggleHistory}
+          className="gap-1.5"
+        >
           <GitBranch className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">History</span>
         </Button>

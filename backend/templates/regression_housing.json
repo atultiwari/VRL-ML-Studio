@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "template-sample-1",
+      "type": "vrl.core.sample_dataset",
+      "label": "Housing Dataset",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "dataset": "housing"
+      }
+    },
+    {
+      "id": "template-scaler-1",
+      "type": "vrl.core.feature_scaler",
+      "label": "Feature Scaler",
+      "position": { "x": 100, "y": 300 },
+      "parameters": {
+        "method": "standard"
+      }
+    },
+    {
+      "id": "template-splitter-1",
+      "type": "vrl.core.train_test_splitter",
+      "label": "Train-Test Splitter",
+      "position": { "x": 100, "y": 500 },
+      "parameters": {
+        "target_col": "MedHouseVal",
+        "test_size": 0.2,
+        "random_state": 42,
+        "stratify": false
+      }
+    },
+    {
+      "id": "template-linreg-1",
+      "type": "vrl.core.linear_regression",
+      "label": "Linear Regression",
+      "position": { "x": 100, "y": 700 },
+      "parameters": {
+        "fit_intercept": true
+      }
+    },
+    {
+      "id": "template-regreport-1",
+      "type": "vrl.core.regression_report",
+      "label": "Regression Report",
+      "position": { "x": 100, "y": 900 },
+      "parameters": {
+        "target_col": "MedHouseVal"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-sample-scaler",
+      "source": "template-sample-1",
+      "target": "template-scaler-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-scaler-splitter",
+      "source": "template-scaler-1",
+      "target": "template-splitter-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-splitter-linreg",
+      "source": "template-splitter-1",
+      "target": "template-linreg-1",
+      "sourcePort": "split_data_out",
+      "targetPort": "split_data_in"
+    },
+    {
+      "id": "edge-linreg-model-report",
+      "source": "template-linreg-1",
+      "target": "template-regreport-1",
+      "sourcePort": "model_out",
+      "targetPort": "model_in"
+    },
+    {
+      "id": "edge-linreg-data-report",
+      "source": "template-linreg-1",
+      "target": "template-regreport-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    }
+  ]
+}

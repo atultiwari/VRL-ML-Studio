@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "template-sample-1",
+      "type": "vrl.core.sample_dataset",
+      "label": "Iris Dataset",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "dataset": "iris"
+      }
+    },
+    {
+      "id": "template-splitter-1",
+      "type": "vrl.core.train_test_splitter",
+      "label": "Train-Test Splitter",
+      "position": { "x": 100, "y": 300 },
+      "parameters": {
+        "target_col": "target",
+        "test_size": 0.3,
+        "random_state": 42,
+        "stratify": true
+      }
+    },
+    {
+      "id": "template-rf-1",
+      "type": "vrl.core.random_forest_classifier",
+      "label": "Random Forest Classifier",
+      "position": { "x": 100, "y": 500 },
+      "parameters": {
+        "n_estimators": 100,
+        "max_depth": null,
+        "max_features": "sqrt",
+        "random_state": 42
+      }
+    },
+    {
+      "id": "template-classreport-1",
+      "type": "vrl.core.classification_report",
+      "label": "Classification Report",
+      "position": { "x": 100, "y": 700 },
+      "parameters": {
+        "target_col": "target"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-sample-splitter",
+      "source": "template-sample-1",
+      "target": "template-splitter-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-splitter-rf",
+      "source": "template-splitter-1",
+      "target": "template-rf-1",
+      "sourcePort": "split_data_out",
+      "targetPort": "split_data_in"
+    },
+    {
+      "id": "edge-rf-model-report",
+      "source": "template-rf-1",
+      "target": "template-classreport-1",
+      "sourcePort": "model_out",
+      "targetPort": "model_in"
+    },
+    {
+      "id": "edge-rf-data-report",
+      "source": "template-rf-1",
+      "target": "template-classreport-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    }
+  ]
+}

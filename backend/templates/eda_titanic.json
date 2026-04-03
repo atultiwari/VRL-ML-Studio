@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "template-sample-1",
+      "type": "vrl.core.sample_dataset",
+      "label": "Titanic Dataset",
+      "position": { "x": 100, "y": 100 },
+      "parameters": {
+        "dataset": "titanic"
+      }
+    },
+    {
+      "id": "template-profiler-1",
+      "type": "vrl.core.data_profiler",
+      "label": "Data Profiler",
+      "position": { "x": -200, "y": 400 },
+      "parameters": {}
+    },
+    {
+      "id": "template-corr-1",
+      "type": "vrl.core.correlation_matrix",
+      "label": "Correlation Matrix",
+      "position": { "x": 100, "y": 400 },
+      "parameters": {
+        "method": "pearson"
+      }
+    },
+    {
+      "id": "template-dist-1",
+      "type": "vrl.core.distribution_viewer",
+      "label": "Age Distribution",
+      "position": { "x": 400, "y": 400 },
+      "parameters": {
+        "column": "age",
+        "bins": 30,
+        "kde": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-sample-profiler",
+      "source": "template-sample-1",
+      "target": "template-profiler-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-sample-corr",
+      "source": "template-sample-1",
+      "target": "template-corr-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    },
+    {
+      "id": "edge-sample-dist",
+      "source": "template-sample-1",
+      "target": "template-dist-1",
+      "sourcePort": "dataframe_out",
+      "targetPort": "dataframe_in"
+    }
+  ]
+}
