@@ -1,0 +1,28 @@
+[
+  {
+    "id": "C",
+    "label": "Regularization (C)",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.001,
+    "max": 1000,
+    "tier": "basic"
+  },
+  {
+    "id": "kernel",
+    "label": "Kernel",
+    "type": "select",
+    "options": ["rbf", "linear", "poly", "sigmoid"],
+    "default": "rbf",
+    "tier": "basic"
+  },
+  {
+    "id": "epsilon",
+    "label": "Epsilon",
+    "type": "float",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 10.0,
+    "tier": "basic"
+  }
+]

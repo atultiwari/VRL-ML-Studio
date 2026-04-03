@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.residual_plot",
+  "name": "Residual Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.regression",
+  "description": "Scatter plot of residuals (actual − predicted) against predicted values for diagnosing regression model fit.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Residual Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

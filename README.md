@@ -133,8 +133,8 @@ This project is built in 12 stages. Each stage is gate-approved before the next 
 | 4 | Data Input & EDA Nodes | ✅ Complete |
 | 5 | Preprocessing Nodes | ✅ Complete |
 | 6 | Classification Models & Evaluation | ✅ Complete |
-| 7 | Regression Models & Evaluation | 🔄 Next |
-| 8 | Unsupervised Models & Evaluation | Pending |
+| 7 | Regression Models & Evaluation | ✅ Complete |
+| 8 | Unsupervised Models & Evaluation | 🔄 Next |
 | 9 | Git-Based Project Management | Pending |
 | 10 | Code Export (Python + Jupyter) | Pending |
 | 11 | Node Package Import/Export UI | Pending |

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "fit_intercept",
+    "label": "Fit Intercept",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  }
+]

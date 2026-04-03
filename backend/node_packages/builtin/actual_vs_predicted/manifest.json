@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.actual_vs_predicted",
+  "name": "Actual vs Predicted",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.regression",
+  "description": "Scatter plot comparing actual target values against model predictions with a perfect-prediction reference line.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Actual vs Predicted" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

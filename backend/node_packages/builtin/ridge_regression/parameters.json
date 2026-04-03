@@ -1,0 +1,19 @@
+[
+  {
+    "id": "alpha",
+    "label": "Alpha (Regularization)",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.001,
+    "max": 1000,
+    "tier": "basic"
+  },
+  {
+    "id": "solver",
+    "label": "Solver",
+    "type": "select",
+    "options": ["auto", "svd", "cholesky", "lsqr", "sparse_cg", "sag", "saga"],
+    "default": "auto",
+    "tier": "advanced"
+  }
+]

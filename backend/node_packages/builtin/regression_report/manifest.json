@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.regression_report",
+  "name": "Regression Report",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.regression",
+  "description": "Compute MAE, MSE, RMSE, R², and Adjusted R² for a trained regression model on the test set.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "metrics_out", "type": "Metrics", "label": "Regression Metrics" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}
