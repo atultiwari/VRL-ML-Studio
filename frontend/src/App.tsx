@@ -4,6 +4,7 @@ import { OutputPanel } from '@/components/output/OutputPanel'
 import { ParamPanel } from '@/components/panel/ParamPanel'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
+import { ExportDialog } from '@/components/toolbar/ExportDialog'
 import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
 import { checkHealth } from '@/lib/api'
@@ -18,10 +19,12 @@ import type { PipelineJSON } from '@/lib/types'
 type BackendStatus = 'connecting' | 'online' | 'offline'
 type View = 'dashboard' | 'canvas'
 
+
 export function App() {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('connecting')
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
   const [view, setView] = useState<View>('dashboard')
+  const [exportOpen, setExportOpen] = useState(false)
 
   const { manifests, loading, error } = useNodeRegistry()
   const { executePipeline }           = useWebSocket()
@@ -81,6 +84,10 @@ export function App() {
     await saveProject(toPipelineJSON())
   }, [currentProject, saveProject, toPipelineJSON])
 
+  const handleExport = useCallback(() => {
+    setExportOpen(true)
+  }, [])
+
   const handleToggleHistory = useCallback(() => {
     setHistoryOpen(!historyOpen)
   }, [historyOpen, setHistoryOpen])
@@ -125,6 +132,7 @@ export function App() {
         nodesLoaded={nodesLoaded}
         onRun={handleRun}
         onSave={handleSave}
+        onExport={handleExport}
         onToggleHistory={handleToggleHistory}
         onGoHome={handleGoHome}
       />
@@ -139,6 +147,13 @@ export function App() {
 
         {outputNodeId && <OutputPanel />}
       </div>
+
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        pipeline={toPipelineJSON()}
+        pipelineName={currentProject?.name ?? 'Untitled Pipeline'}
+      />
     </div>
   )
 }

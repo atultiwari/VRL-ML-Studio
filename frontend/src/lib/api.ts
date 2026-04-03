@@ -30,3 +30,25 @@ export async function getNodes(): Promise<import('./types').NodeManifestWithUI[]
   const { data } = await api.get('/nodes')
   return data
 }
+
+export async function exportPython(
+  pipeline: import('./types').PipelineJSON,
+  pipelineName: string,
+): Promise<Blob> {
+  const { data } = await api.post('/export/python', {
+    pipeline,
+    pipeline_name: pipelineName,
+  }, { responseType: 'blob' })
+  return data
+}
+
+export async function exportNotebook(
+  pipeline: import('./types').PipelineJSON,
+  pipelineName: string,
+): Promise<Blob> {
+  const { data } = await api.post('/export/notebook', {
+    pipeline,
+    pipeline_name: pipelineName,
+  }, { responseType: 'blob' })
+  return data
+}

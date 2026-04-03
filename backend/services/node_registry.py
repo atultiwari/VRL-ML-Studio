@@ -199,6 +199,20 @@ class NodeRegistry:
     def get_parameters(self, node_type: str) -> list[ParameterSpec]:
         return self._get_package(node_type).parameters
 
+    def get_manifest(self, node_type: str) -> dict | None:
+        """Return a dict representation of the manifest, or None if not found."""
+        pkg = self._packages.get(node_type)
+        if pkg is None:
+            return None
+        return pkg.manifest.model_dump()
+
+    def get_package_dir(self, node_type: str) -> Path | None:
+        """Return the filesystem path of a node package directory."""
+        pkg = self._packages.get(node_type)
+        if pkg is None:
+            return None
+        return pkg.package_dir
+
     def is_registered(self, node_type: str) -> bool:
         return node_type in self._packages
 

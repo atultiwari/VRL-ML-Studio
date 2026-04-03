@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Activity, FolderOpen, GitBranch, Loader2, Play, Save, Zap } from 'lucide-react'
+import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -12,11 +12,12 @@ interface ToolbarProps {
   nodesLoaded?: number
   onRun?: () => void
   onSave?: () => void
+  onExport?: () => void
   onToggleHistory?: () => void
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onToggleHistory, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -138,6 +139,17 @@ export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onToggleHis
         >
           <GitBranch className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">History</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={nodeCount === 0}
+          onClick={onExport}
+          className="gap-1.5"
+        >
+          <Download className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Export</span>
         </Button>
 
         <span className="mx-1 h-4 w-px bg-border" />
