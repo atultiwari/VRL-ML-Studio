@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.passthrough",
+  "name": "Passthrough",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.input",
+  "description": "Passes a DataFrame through unchanged. Used for testing the node execution pipeline.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Output Data" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

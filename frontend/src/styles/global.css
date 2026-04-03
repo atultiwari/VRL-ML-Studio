@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design Tokens ────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Dark theme (default) */
+    --background:         222 20% 7%;
+    --foreground:         210 20% 92%;
+
+    --card:               222 18% 10%;
+    --card-foreground:    210 20% 92%;
+
+    --border:             222 15% 16%;
+    --input:              222 15% 14%;
+    --ring:               142 71% 45%;
+
+    --muted:              222 15% 14%;
+    --muted-foreground:   215 16% 55%;
+
+    --accent:             142 71% 45%;   /* emerald-500 */
+    --accent-foreground:  142 84% 10%;
+
+    --primary:            142 71% 45%;
+    --primary-foreground: 142 84% 10%;
+
+    --secondary:          222 15% 14%;
+    --secondary-foreground: 210 20% 80%;
+
+    --radius: 0.5rem;
+
+    /* Canvas-specific */
+    --canvas-bg:          222 20% 6%;
+    --canvas-dot:         222 15% 18%;
+    --node-bg:            222 18% 12%;
+    --node-border:        222 15% 20%;
+    --node-border-hover:  142 71% 45%;
+
+    /* Status colors */
+    --status-idle:        215 16% 40%;
+    --status-running:     213 93% 67%;
+    --status-success:     142 71% 45%;
+    --status-error:       0 84% 60%;
+
+    /* Spacing */
+    --topbar-height:      3.25rem;
+    --sidebar-width:      15rem;
+    --panel-width:        20rem;
+  }
+}
+
+/* ── Base Styles ──────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+/* ── Canvas Dot Grid ──────────────────────────────────────────────────────── */
+.canvas-grid {
+  background-color: hsl(var(--canvas-bg));
+  background-image: radial-gradient(
+    circle,
+    hsl(var(--canvas-dot)) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* ── React Flow overrides ─────────────────────────────────────────────────── */
+.react-flow__renderer {
+  background: transparent !important;
+}
+.react-flow__background {
+  background: transparent !important;
+}
+.react-flow__edge-path {
+  stroke: hsl(var(--border)) !important;
+  stroke-width: 1.5 !important;
+}
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: hsl(var(--accent)) !important;
+}
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid hsl(var(--border)) !important;
+  background: hsl(var(--card)) !important;
+  transition: border-color 150ms, background-color 150ms;
+}
+.react-flow__handle:hover {
+  border-color: hsl(var(--accent)) !important;
+  background: hsl(var(--accent)) !important;
+}
