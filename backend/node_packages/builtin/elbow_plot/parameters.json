@@ -1,0 +1,27 @@
+[
+  {
+    "id": "k_min",
+    "label": "Min Clusters (k)",
+    "type": "int",
+    "default": 2,
+    "min": 2,
+    "max": 10,
+    "tier": "basic"
+  },
+  {
+    "id": "k_max",
+    "label": "Max Clusters (k)",
+    "type": "int",
+    "default": 10,
+    "min": 3,
+    "max": 30,
+    "tier": "basic"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

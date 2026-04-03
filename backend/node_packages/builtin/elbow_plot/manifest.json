@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.elbow_plot",
+  "name": "Elbow Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.clustering",
+  "description": "Runs K-Means for a range of k values and plots inertia to help identify the optimal number of clusters via the elbow method.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Elbow Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

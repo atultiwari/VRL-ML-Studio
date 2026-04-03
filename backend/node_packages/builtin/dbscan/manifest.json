@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.dbscan",
+  "name": "DBSCAN",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.unsupervised",
+  "description": "Density-based clustering that discovers clusters of arbitrary shape and identifies noise points.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Clustered Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Cluster Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

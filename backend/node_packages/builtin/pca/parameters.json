@@ -1,0 +1,19 @@
+[
+  {
+    "id": "n_components",
+    "label": "Number of Components",
+    "type": "int",
+    "default": 2,
+    "min": 1,
+    "max": 50,
+    "tier": "basic"
+  },
+  {
+    "id": "svd_solver",
+    "label": "SVD Solver",
+    "type": "select",
+    "options": ["auto", "full", "arpack", "randomized"],
+    "default": "auto",
+    "tier": "advanced"
+  }
+]

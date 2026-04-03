@@ -134,22 +134,22 @@ This project is built in 12 stages. Each stage is gate-approved before the next 
 | 5 | Preprocessing Nodes | ✅ Complete |
 | 6 | Classification Models & Evaluation | ✅ Complete |
 | 7 | Regression Models & Evaluation | ✅ Complete |
-| 8 | Unsupervised Models & Evaluation | 🔄 Next |
-| 9 | Git-Based Project Management | Pending |
+| 8 | Unsupervised Models & Evaluation | ✅ Complete |
+| 9 | Git-Based Project Management | 🔄 Next |
 | 10 | Code Export (Python + Jupyter) | Pending |
 | 11 | Node Package Import/Export UI | Pending |
 | 12 | Polish, Testing & Documentation | Pending |
 
-### Stage 6 — What's working now
+### Stage 8 — What's working now
 
 All previous stages plus:
 
-- **8 classification model nodes**: Logistic Regression, Decision Tree, Random Forest, XGBoost, SVM, KNN, Naive Bayes, Gradient Boosting
-- **5 evaluation nodes**: Classification Report, Confusion Matrix, ROC-AUC Curve, Precision-Recall Curve, Feature Importance
-- **Full classification pipeline**: Load CSV → Preprocess → Train → Evaluate (metrics + charts)
-- **Color-coded metrics cards**: green (good), amber (fair), red (poor) based on metric type and value
-- **Interactive Plotly charts** for confusion matrix, ROC curves, precision-recall curves, feature importance
-- **77 backend tests** passing (15 new classification/evaluation tests)
+- **5 unsupervised model nodes**: K-Means, Hierarchical Clustering, DBSCAN, PCA, t-SNE
+- **3 clustering evaluation nodes**: Cluster Report (silhouette, Calinski-Harabasz, Davies-Bouldin), Cluster Visualization, Elbow Plot
+- **Unsupervised pipeline**: Load CSV → Cluster (or reduce dims) → Evaluate (metrics + colored scatter)
+- **PCA/t-SNE** output transformed coordinates as DataFrame + 2D scatter plot
+- **Elbow method** runs K-Means for a range of k values and plots inertia curve
+- **101 backend tests** passing (12 new unsupervised/clustering tests)
 
 ---
 

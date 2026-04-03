@@ -1,0 +1,36 @@
+[
+  {
+    "id": "n_components",
+    "label": "Number of Components",
+    "type": "int",
+    "default": 2,
+    "min": 2,
+    "max": 3,
+    "tier": "basic"
+  },
+  {
+    "id": "perplexity",
+    "label": "Perplexity",
+    "type": "float",
+    "default": 30.0,
+    "min": 5.0,
+    "max": 100.0,
+    "tier": "basic"
+  },
+  {
+    "id": "learning_rate",
+    "label": "Learning Rate",
+    "type": "float",
+    "default": 200.0,
+    "min": 10.0,
+    "max": 1000.0,
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

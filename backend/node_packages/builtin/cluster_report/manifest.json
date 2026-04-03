@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.cluster_report",
+  "name": "Cluster Report",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.clustering",
+  "description": "Computes clustering quality metrics including silhouette score, Calinski-Harabasz index, and Davies-Bouldin index from a DataFrame with cluster labels.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Clustered Data" }
+  ],
+  "outputs": [
+    { "id": "metrics_out", "type": "Metrics", "label": "Clustering Metrics" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

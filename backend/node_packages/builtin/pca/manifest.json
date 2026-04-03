@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.pca",
+  "name": "PCA",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.unsupervised",
+  "description": "Principal Component Analysis for dimensionality reduction, projecting data onto orthogonal axes of maximum variance.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Transformed Data" },
+    { "id": "plot_out", "type": "Plot", "label": "PCA Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

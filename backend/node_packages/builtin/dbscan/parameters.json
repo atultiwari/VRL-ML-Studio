@@ -1,0 +1,28 @@
+[
+  {
+    "id": "eps",
+    "label": "Epsilon (Neighborhood Radius)",
+    "type": "float",
+    "default": 0.5,
+    "min": 0.01,
+    "max": 10.0,
+    "tier": "basic"
+  },
+  {
+    "id": "min_samples",
+    "label": "Min Samples",
+    "type": "int",
+    "default": 5,
+    "min": 1,
+    "max": 100,
+    "tier": "basic"
+  },
+  {
+    "id": "metric",
+    "label": "Distance Metric",
+    "type": "select",
+    "options": ["euclidean", "manhattan", "cosine"],
+    "default": "euclidean",
+    "tier": "advanced"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.cluster_visualization",
+  "name": "Cluster Visualization",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.clustering",
+  "description": "Creates a 2D scatter plot of clustered data, using PCA for dimensionality reduction when more than two features are present.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Clustered Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Cluster Visualization" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

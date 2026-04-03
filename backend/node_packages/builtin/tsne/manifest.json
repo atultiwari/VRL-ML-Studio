@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.tsne",
+  "name": "t-SNE",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.unsupervised",
+  "description": "t-Distributed Stochastic Neighbor Embedding for non-linear dimensionality reduction and visualization of high-dimensional data.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Transformed Data" },
+    { "id": "plot_out", "type": "Plot", "label": "t-SNE Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

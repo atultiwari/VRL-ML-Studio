@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.hierarchical_clustering",
+  "name": "Hierarchical Clustering",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.unsupervised",
+  "description": "Agglomerative hierarchical clustering that merges data points bottom-up into a specified number of clusters.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Clustered Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Cluster Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

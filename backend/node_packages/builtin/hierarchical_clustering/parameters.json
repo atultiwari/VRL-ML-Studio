@@ -1,0 +1,27 @@
+[
+  {
+    "id": "n_clusters",
+    "label": "Number of Clusters",
+    "type": "int",
+    "default": 3,
+    "min": 2,
+    "max": 20,
+    "tier": "basic"
+  },
+  {
+    "id": "linkage",
+    "label": "Linkage Method",
+    "type": "select",
+    "options": ["ward", "complete", "average", "single"],
+    "default": "ward",
+    "tier": "basic"
+  },
+  {
+    "id": "affinity",
+    "label": "Distance Metric",
+    "type": "select",
+    "options": ["euclidean", "manhattan", "cosine"],
+    "default": "euclidean",
+    "tier": "advanced"
+  }
+]
