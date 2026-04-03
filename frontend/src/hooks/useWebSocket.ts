@@ -5,14 +5,46 @@ import type { PipelineJSON } from '@/lib/types'
 
 const WS_URL = (import.meta.env.VITE_WS_URL ?? 'ws://localhost:8000') + '/ws'
 const RECONNECT_DELAY_MS = 3000
+const EXECUTION_TIMEOUT_MS = 120_000 // 2 minutes
 
 export function useWebSocket() {
   const wsRef      = useRef<WebSocket | null>(null)
-
   const pingRef    = useRef<ReturnType<typeof setInterval> | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Guard against React StrictMode double-mount
+  const mountedRef = useRef(false)
+
+  const clearExecutionTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+  }
+
+  const startExecutionTimeout = () => {
+    clearExecutionTimeout()
+    timeoutRef.current = setTimeout(() => {
+      const store = useExecutionStore.getState()
+      if (!store.running) return
+      // Timeout: mark all still-running nodes as error
+      const statuses = store.nodeStatuses
+      for (const [nodeId, status] of Object.entries(statuses)) {
+        if (status === 'running') {
+          store.setNodeStatus(nodeId, 'error')
+          usePipelineStore.getState().updateNodeStatus(nodeId, 'error')
+        }
+      }
+      store.setRunning(false)
+    }, EXECUTION_TIMEOUT_MS)
+  }
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
+    // Close any lingering CONNECTING socket (e.g. from StrictMode re-mount)
+    if (wsRef.current?.readyState === WebSocket.CONNECTING) {
+      wsRef.current.close()
+    }
 
     const ws = new WebSocket(WS_URL)
     wsRef.current = ws
@@ -36,8 +68,25 @@ export function useWebSocket() {
 
     ws.onclose = () => {
       if (pingRef.current) clearInterval(pingRef.current)
-      // Reconnect after delay
-      setTimeout(connect, RECONNECT_DELAY_MS)
+      pingRef.current = null
+      // Only reconnect if this component is still mounted
+      if (mountedRef.current) {
+        setTimeout(connect, RECONNECT_DELAY_MS)
+      }
+
+      // If execution was in progress when WS dropped, mark stale running nodes
+      const store = useExecutionStore.getState()
+      if (store.running) {
+        const statuses = store.nodeStatuses
+        for (const [nodeId, status] of Object.entries(statuses)) {
+          if (status === 'running') {
+            store.setNodeStatus(nodeId, 'error')
+            usePipelineStore.getState().updateNodeStatus(nodeId, 'error')
+          }
+        }
+        store.setRunning(false)
+        clearExecutionTimeout()
+      }
     }
 
     ws.onerror = () => {
@@ -51,18 +100,40 @@ export function useWebSocket() {
 
     if (type === 'execution_start') {
       store.setRunning(true)
+      startExecutionTimeout()
       return
     }
 
     if (type === 'execution_done') {
+      clearExecutionTimeout()
+      // Mark any nodes still stuck as "running" → "success" (they completed but status was lost)
+      const statuses = store.nodeStatuses
+      for (const [nodeId, status] of Object.entries(statuses)) {
+        if (status === 'running') {
+          store.setNodeStatus(nodeId, 'success')
+          usePipelineStore.getState().updateNodeStatus(nodeId, 'success')
+        }
+      }
       store.setRunning(false)
       return
     }
 
     if (type === 'execution_error') {
+      clearExecutionTimeout()
       store.setRunning(false)
       const nodeId = msg.node_id as string | undefined
-      if (nodeId) store.setNodeStatus(nodeId, 'error')
+      if (nodeId) {
+        store.setNodeStatus(nodeId, 'error')
+        usePipelineStore.getState().updateNodeStatus(nodeId, 'error')
+      }
+      // Mark any still-running nodes as idle (they never ran)
+      const statuses = store.nodeStatuses
+      for (const [nid, status] of Object.entries(statuses)) {
+        if (status === 'running' && nid !== nodeId) {
+          store.setNodeStatus(nid, 'idle')
+          usePipelineStore.getState().updateNodeStatus(nid, 'idle')
+        }
+      }
       return
     }
 
@@ -82,9 +153,12 @@ export function useWebSocket() {
   }
 
   useEffect(() => {
+    mountedRef.current = true
     connect()
     return () => {
+      mountedRef.current = false
       if (pingRef.current) clearInterval(pingRef.current)
+      clearExecutionTimeout()
       wsRef.current?.close()
     }
   }, [connect])
@@ -93,7 +167,7 @@ export function useWebSocket() {
   const executePipeline = useCallback((pipeline: PipelineJSON) => {
     const ws = wsRef.current
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      console.error('WebSocket not connected')
+      console.error('WebSocket not connected — cannot execute pipeline')
       return
     }
 

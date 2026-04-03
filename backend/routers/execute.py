@@ -62,11 +62,17 @@ async def websocket_execute(websocket: WebSocket) -> None:
     await websocket.accept()
     logger.info("WebSocket client connected")
 
+    ws_alive = True
+
     async def send(msg: dict) -> None:
+        nonlocal ws_alive
+        if not ws_alive:
+            return
         try:
             await websocket.send_json(msg)
-        except Exception:
-            pass
+        except Exception as exc:
+            ws_alive = False
+            logger.warning("WebSocket send failed (type=%s): %s", msg.get("type"), exc)
 
     try:
         while True:
@@ -90,8 +96,10 @@ async def websocket_execute(websocket: WebSocket) -> None:
             await send({"type": "error", "message": f"Unknown message type: {msg_type!r}"})
 
     except WebSocketDisconnect:
+        ws_alive = False
         logger.info("WebSocket client disconnected")
     except Exception as exc:
+        ws_alive = False
         logger.error("WebSocket error: %s", exc)
         await send({"type": "error", "message": str(exc)})
 
@@ -108,25 +116,37 @@ async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
     executor = DAGExecutor(registry=registry, cache=cache)
     loop     = asyncio.get_event_loop()
 
+    CALLBACK_TIMEOUT = 15  # seconds — generous for large payloads
+
     # Thread-safe callbacks — use run_coroutine_threadsafe to reach the async loop
     def on_start(node_id: str) -> None:
-        asyncio.run_coroutine_threadsafe(
-            send({"type": "node_status", "node_id": node_id, "status": "running"}),
-            loop,
-        ).result(timeout=5)
+        try:
+            asyncio.run_coroutine_threadsafe(
+                send({"type": "node_status", "node_id": node_id, "status": "running"}),
+                loop,
+            ).result(timeout=CALLBACK_TIMEOUT)
+        except Exception as exc:
+            logger.warning("Failed to send 'running' for node '%s': %s", node_id, exc)
 
     def on_done(node_id: str, result: dict[str, Any]) -> None:
-        serialized = serialize_node_outputs(result)
-        asyncio.run_coroutine_threadsafe(
-            send({"type": "node_status", "node_id": node_id, "status": "success", "output": serialized}),
-            loop,
-        ).result(timeout=5)
+        try:
+            serialized = serialize_node_outputs(result)
+            asyncio.run_coroutine_threadsafe(
+                send({"type": "node_status", "node_id": node_id, "status": "success", "output": serialized}),
+                loop,
+            ).result(timeout=CALLBACK_TIMEOUT)
+            logger.info("Node '%s' — status 'success' sent to client", node_id)
+        except Exception as exc:
+            logger.error("Failed to send 'success' for node '%s': %s", node_id, exc)
 
     def on_error(node_id: str, error: str) -> None:
-        asyncio.run_coroutine_threadsafe(
-            send({"type": "node_status", "node_id": node_id, "status": "error", "error": error}),
-            loop,
-        ).result(timeout=5)
+        try:
+            asyncio.run_coroutine_threadsafe(
+                send({"type": "node_status", "node_id": node_id, "status": "error", "error": error}),
+                loop,
+            ).result(timeout=CALLBACK_TIMEOUT)
+        except Exception as exc:
+            logger.warning("Failed to send 'error' for node '%s': %s", node_id, exc)
 
     await send({"type": "execution_start", "node_count": len(pipeline.nodes)})
 
@@ -145,4 +165,5 @@ async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
     except DAGExecutionError as exc:
         await send({"type": "execution_error", "node_id": exc.node_id, "error": exc.message})
     except Exception as exc:
+        logger.error("Pipeline execution failed: %s", exc)
         await send({"type": "execution_error", "error": str(exc)})
