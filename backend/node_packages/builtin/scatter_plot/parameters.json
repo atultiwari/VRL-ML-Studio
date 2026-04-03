@@ -1,0 +1,23 @@
+[
+  {
+    "id": "x_col",
+    "label": "X Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  },
+  {
+    "id": "y_col",
+    "label": "Y Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  },
+  {
+    "id": "color_col",
+    "label": "Color By",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  }
+]

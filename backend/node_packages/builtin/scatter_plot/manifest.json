@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.scatter_plot",
+  "name": "Scatter Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Renders an interactive scatter plot for two selected columns with optional color grouping.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Scatter Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

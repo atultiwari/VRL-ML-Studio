@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.data_profiler",
+  "name": "Data Profiler",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Computes per-column statistics (count, nulls, dtype, mean/std for numeric, unique count for categorical) and returns a bar chart showing null percentage per column.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Profile Chart" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

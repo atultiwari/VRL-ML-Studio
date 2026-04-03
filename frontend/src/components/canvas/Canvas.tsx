@@ -79,9 +79,21 @@ export function Canvas({ manifests }: CanvasProps) {
     pushSnapshot()
   }, [pushSnapshot])
 
+  const openOutputPanel = useCallback((nodeId: string) => {
+    // Dynamically import to avoid circular store dependency
+    import('@/store/executionStore').then(({ useExecutionStore }) => {
+      const { nodeOutputs, openOutputPanel: open } = useExecutionStore.getState()
+      if (nodeOutputs[nodeId]) open(nodeId)
+    })
+  }, [])
+
   const onNodeClick: NodeMouseHandler = useCallback((_e, node) => {
     setSelectedNodeId(node.id)
   }, [setSelectedNodeId])
+
+  const onNodeDoubleClick: NodeMouseHandler = useCallback((_e, node) => {
+    openOutputPanel(node.id)
+  }, [openOutputPanel])
 
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null)
@@ -101,6 +113,7 @@ export function Canvas({ manifests }: CanvasProps) {
         onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
         onNodeClick={onNodeClick}
+        onNodeDoubleClick={onNodeDoubleClick}
         onPaneClick={onPaneClick}
         onInit={instance => { rfInstanceRef.current = instance }}
         nodeTypes={NODE_TYPES}

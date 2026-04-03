@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.distribution_viewer",
+  "name": "Distribution Viewer",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Displays the distribution of a selected numeric column as a histogram with an optional KDE (rug) overlay.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Distribution Chart" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

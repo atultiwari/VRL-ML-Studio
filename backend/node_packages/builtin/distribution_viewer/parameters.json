@@ -1,0 +1,25 @@
+[
+  {
+    "id": "column",
+    "label": "Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  },
+  {
+    "id": "bins",
+    "label": "Bins",
+    "type": "int",
+    "default": 20,
+    "min": 5,
+    "max": 200,
+    "tier": "basic"
+  },
+  {
+    "id": "kde",
+    "label": "Show KDE",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  }
+]

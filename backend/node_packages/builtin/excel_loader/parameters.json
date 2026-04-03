@@ -1,0 +1,32 @@
+[
+  {
+    "id": "file_path",
+    "label": "File Path",
+    "type": "str",
+    "default": "",
+    "tier": "hidden"
+  },
+  {
+    "id": "file_name",
+    "label": "File",
+    "type": "str",
+    "default": "",
+    "tier": "hidden"
+  },
+  {
+    "id": "sheet_name",
+    "label": "Sheet Name",
+    "type": "str",
+    "default": "0",
+    "tier": "basic"
+  },
+  {
+    "id": "header_row",
+    "label": "Header Row",
+    "type": "int",
+    "default": 0,
+    "min": 0,
+    "max": 10,
+    "tier": "advanced"
+  }
+]

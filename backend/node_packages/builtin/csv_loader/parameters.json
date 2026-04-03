@@ -1,0 +1,47 @@
+[
+  {
+    "id": "file_path",
+    "label": "File Path",
+    "type": "str",
+    "default": "",
+    "tier": "hidden"
+  },
+  {
+    "id": "file_name",
+    "label": "File",
+    "type": "str",
+    "default": "",
+    "tier": "hidden"
+  },
+  {
+    "id": "delimiter",
+    "label": "Delimiter",
+    "type": "select",
+    "default": ",",
+    "options": [",", ";", "\\t", "|"],
+    "tier": "advanced"
+  },
+  {
+    "id": "encoding",
+    "label": "Encoding",
+    "type": "str",
+    "default": "utf-8",
+    "tier": "advanced"
+  },
+  {
+    "id": "header_row",
+    "label": "Header Row",
+    "type": "int",
+    "default": 0,
+    "min": 0,
+    "max": 10,
+    "tier": "advanced"
+  },
+  {
+    "id": "parse_dates",
+    "label": "Parse Dates",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Canvas } from '@/components/canvas/Canvas'
+import { OutputPanel } from '@/components/output/OutputPanel'
 import { ParamPanel } from '@/components/panel/ParamPanel'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import { checkHealth } from '@/lib/api'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
+import { useWebSocket } from '@/hooks/useWebSocket'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
+import { useExecutionStore } from '@/store/executionStore'
 
 type BackendStatus = 'connecting' | 'online' | 'offline'
 
@@ -15,18 +18,21 @@ export function App() {
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
 
   const { manifests, loading, error } = useNodeRegistry()
-  const selectedNodeId = useUIStore(s => s.selectedNodeId)
+  const { executePipeline }           = useWebSocket()
+  const selectedNodeId                = useUIStore(s => s.selectedNodeId)
+  const outputNodeId                  = useExecutionStore(s => s.outputPanelNodeId)
 
   // Keyboard shortcuts for undo/redo
-  const undo = usePipelineStore(s => s.undo)
-  const redo = usePipelineStore(s => s.redo)
+  const undo             = usePipelineStore(s => s.undo)
+  const redo             = usePipelineStore(s => s.redo)
+  const toPipelineJSON   = usePipelineStore(s => s.toPipelineJSON)
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey
       if (!mod) return
       if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
-      if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); redo() }
+      if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); redo() }
     },
     [undo, redo]
   )
@@ -39,32 +45,39 @@ export function App() {
   // Backend health polling
   useEffect(() => {
     let cancelled = false
-
     const ping = async () => {
       try {
         const data = await checkHealth()
-        if (!cancelled) {
-          setBackendStatus('online')
-          setNodesLoaded(data.nodes_loaded)
-        }
+        if (!cancelled) { setBackendStatus('online'); setNodesLoaded(data.nodes_loaded) }
       } catch {
         if (!cancelled) setBackendStatus('offline')
       }
     }
-
     ping()
     const interval = setInterval(ping, 30_000)
     return () => { cancelled = true; clearInterval(interval) }
   }, [])
 
+  const handleRun = useCallback(() => {
+    executePipeline(toPipelineJSON())
+  }, [executePipeline, toPipelineJSON])
+
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
-      <Toolbar backendStatus={backendStatus} nodesLoaded={nodesLoaded} />
+      <Toolbar
+        backendStatus={backendStatus}
+        nodesLoaded={nodesLoaded}
+        onRun={handleRun}
+      />
 
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar manifests={manifests} loading={loading} error={error} />
-        <Canvas manifests={manifests} />
-        {selectedNodeId && <ParamPanel />}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar manifests={manifests} loading={loading} error={error} />
+          <Canvas manifests={manifests} />
+          {selectedNodeId && <ParamPanel />}
+        </div>
+
+        {outputNodeId && <OutputPanel />}
       </div>
     </div>
   )

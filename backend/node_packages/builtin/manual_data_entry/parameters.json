@@ -1,0 +1,9 @@
+[
+  {
+    "id": "csv_text",
+    "label": "CSV Data",
+    "type": "str",
+    "default": "col1,col2,col3\n1,a,0.5\n2,b,1.0\n3,c,1.5",
+    "tier": "basic"
+  }
+]

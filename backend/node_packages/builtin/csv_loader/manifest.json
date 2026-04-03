@@ -1,0 +1,16 @@
+{
+  "id": "vrl.core.csv_loader",
+  "name": "CSV Loader",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.input",
+  "description": "Load a CSV or TSV file from disk. Upload the file using the file picker in the parameter panel.",
+  "inputs": [],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "vrl.core.manual_data_entry",
+  "name": "Manual Data Entry",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.input",
+  "description": "Enter data manually as comma-separated values. First row is treated as header.",
+  "inputs": [],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

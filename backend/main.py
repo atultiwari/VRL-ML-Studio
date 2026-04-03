@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.logging import get_logger
 from core.settings import settings
-from routers import execute, export, nodes, project
+from routers import execute, export, nodes, project, upload
 from services.cache import CacheService
 from services.dag_executor import DAGExecutor
 from services.node_registry import NodeRegistry
@@ -26,7 +26,8 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("VRL ML Studio backend starting up (v%s)", settings.vrl_studio_version)
     registry.load_builtin_packages()
-    app.state.registry = registry  # expose to routers via request.app.state
+    app.state.registry = registry
+    app.state.cache = cache
     logger.info("Node registry ready — %d nodes loaded", len(registry))
     yield
     # Shutdown
@@ -58,6 +59,7 @@ app.include_router(execute.router)
 app.include_router(nodes.router)
 app.include_router(project.router)
 app.include_router(export.router)
+app.include_router(upload.router)
 
 
 # ── Health ────────────────────────────────────────────────────────────────────

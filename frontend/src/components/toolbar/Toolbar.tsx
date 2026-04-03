@@ -1,19 +1,23 @@
-import { Activity, GitBranch, Play, Save, Upload, Zap } from 'lucide-react'
+import { Activity, GitBranch, Loader2, Play, Save, Upload, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { usePipelineStore } from '@/store/pipelineStore'
+import { useExecutionStore } from '@/store/executionStore'
 
 interface ToolbarProps {
   backendStatus: 'connecting' | 'online' | 'offline'
   nodesLoaded?: number
+  onRun?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded }: ToolbarProps) {
-  const undo    = usePipelineStore(s => s.undo)
-  const redo    = usePipelineStore(s => s.redo)
-  const canUndo = usePipelineStore(s => s.past.length > 0)
-  const canRedo = usePipelineStore(s => s.future.length > 0)
+export function Toolbar({ backendStatus, nodesLoaded, onRun }: ToolbarProps) {
+  const undo       = usePipelineStore(s => s.undo)
+  const redo       = usePipelineStore(s => s.redo)
+  const canUndo    = usePipelineStore(s => s.past.length > 0)
+  const canRedo    = usePipelineStore(s => s.future.length > 0)
+  const nodeCount  = usePipelineStore(s => s.nodes.length)
+  const isRunning  = useExecutionStore(s => s.running)
 
   const statusVariant =
     backendStatus === 'online'
@@ -99,9 +103,18 @@ export function Toolbar({ backendStatus, nodesLoaded }: ToolbarProps) {
 
         <span className="mx-1 h-4 w-px bg-border" />
 
-        <Button variant="default" size="sm" disabled className="gap-1.5">
-          <Play className="h-3.5 w-3.5 fill-current" />
-          Run
+        <Button
+          variant="default"
+          size="sm"
+          disabled={isRunning || nodeCount === 0 || backendStatus !== 'online'}
+          onClick={onRun}
+          className="gap-1.5"
+        >
+          {isRunning
+            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : <Play className="h-3.5 w-3.5 fill-current" />
+          }
+          {isRunning ? 'Running…' : 'Run'}
         </Button>
       </div>
 

@@ -57,6 +57,9 @@ interface PipelineStore {
   undo: () => void
   redo: () => void
 
+  // Serialise to pipeline JSON for execution
+  toPipelineJSON: () => import('@/lib/types').PipelineJSON
+
   // Misc
   clearPipeline: () => void
 }
@@ -174,6 +177,27 @@ export const usePipelineStore = create<PipelineStore>()(
           nodes: next.nodes,
           edges: next.edges,
         }))
+      },
+
+      toPipelineJSON: () => {
+        const { nodes, edges } = get()
+        return {
+          version: '1.0' as const,
+          nodes: nodes.map(n => ({
+            id: n.id,
+            type: n.data.manifest.id,
+            label: n.data.label,
+            position: n.position,
+            parameters: n.data.parameters,
+          })),
+          edges: edges.map(e => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            sourcePort: e.sourceHandle ?? '',
+            targetPort: e.targetHandle ?? '',
+          })),
+        }
       },
 
       clearPipeline: () => {

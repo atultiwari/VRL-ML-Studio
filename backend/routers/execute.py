@@ -1,61 +1,148 @@
+"""Pipeline execution: POST /execute (sync) and WebSocket /ws (streaming)."""
 from __future__ import annotations
 
 import asyncio
 import json
 from typing import Any
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 
 from core.logging import get_logger
-from models.pipeline import ExecuteRequest, NodeStatus
-from services.cache import CacheService
+from models.pipeline import ExecuteRequest, PipelineJSON
 from services.dag_executor import DAGExecutionError, DAGExecutor
-from services.node_registry import NodeRegistry
+from services.output_serializer import serialize_node_outputs
 
 logger = get_logger(__name__)
 router = APIRouter()
 
 
-def _get_executor(registry: NodeRegistry, cache: CacheService) -> DAGExecutor:
-    return DAGExecutor(registry=registry, cache=cache)
-
+# ── POST /execute (synchronous, returns all outputs at once) ──────────────────
 
 @router.post("/execute")
-async def execute_pipeline(request: ExecuteRequest) -> JSONResponse:
-    """Synchronous pipeline execution endpoint (for simple single-node runs).
+async def execute_pipeline(request_data: ExecuteRequest, request: Request) -> JSONResponse:
+    registry = request.app.state.registry
+    cache    = request.app.state.cache
+    executor = DAGExecutor(registry=registry, cache=cache)
 
-    For multi-node pipelines with real-time status, use the WebSocket endpoint.
-    Full implementation with registry/cache injection in Stage 4.
-    """
-    return JSONResponse({"status": "ok", "message": "Execution endpoint ready"})
+    loop = asyncio.get_event_loop()
 
+    collected: dict[str, dict[str, Any]] = {}
+    errors: dict[str, str] = {}
+
+    def on_done(node_id: str, result: dict[str, Any]) -> None:
+        collected[node_id] = serialize_node_outputs(result)
+
+    def on_error(node_id: str, error: str) -> None:
+        errors[node_id] = error
+
+    try:
+        await loop.run_in_executor(
+            None,
+            lambda: executor.execute(
+                request_data.pipeline,
+                context={"project_path": request_data.project_path},
+                on_node_done=on_done,
+                on_node_error=on_error,
+            ),
+        )
+    except DAGExecutionError as exc:
+        return JSONResponse(
+            status_code=422,
+            content={"status": "error", "node_id": exc.node_id, "error": exc.message, "outputs": collected},
+        )
+
+    return JSONResponse({"status": "success", "outputs": collected, "errors": errors})
+
+
+# ── WebSocket /ws (streaming status per node) ─────────────────────────────────
 
 @router.websocket("/ws")
 async def websocket_execute(websocket: WebSocket) -> None:
-    """WebSocket endpoint for real-time pipeline execution with node status streaming.
-
-    Client sends: { "pipeline": {...}, "project_path": "..." }
-    Server sends: { "node_id": "...", "status": "running"|"success"|"error", "error"?: "..." }
-    """
     await websocket.accept()
     logger.info("WebSocket client connected")
+
+    async def send(msg: dict) -> None:
+        try:
+            await websocket.send_json(msg)
+        except Exception:
+            pass
 
     try:
         while True:
             raw = await websocket.receive_text()
-            data = json.loads(raw)
-
-            if data.get("type") == "ping":
-                await websocket.send_json({"type": "pong"})
+            try:
+                data = json.loads(raw)
+            except json.JSONDecodeError:
+                await send({"type": "error", "message": "Invalid JSON"})
                 continue
 
-            await websocket.send_json(
-                {"type": "info", "message": "WebSocket execution endpoint ready"}
-            )
+            msg_type = data.get("type")
+
+            if msg_type == "ping":
+                await send({"type": "pong"})
+                continue
+
+            if msg_type == "execute":
+                await _run_pipeline(websocket, data, send)
+                continue
+
+            await send({"type": "error", "message": f"Unknown message type: {msg_type!r}"})
 
     except WebSocketDisconnect:
         logger.info("WebSocket client disconnected")
     except Exception as exc:
         logger.error("WebSocket error: %s", exc)
-        await websocket.send_json({"type": "error", "message": str(exc)})
+        await send({"type": "error", "message": str(exc)})
+
+
+async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
+    try:
+        pipeline = PipelineJSON(**data["pipeline"])
+    except Exception as exc:
+        await send({"type": "error", "message": f"Invalid pipeline: {exc}"})
+        return
+
+    registry = websocket.app.state.registry
+    cache    = websocket.app.state.cache
+    executor = DAGExecutor(registry=registry, cache=cache)
+    loop     = asyncio.get_event_loop()
+
+    # Thread-safe callbacks — use run_coroutine_threadsafe to reach the async loop
+    def on_start(node_id: str) -> None:
+        asyncio.run_coroutine_threadsafe(
+            send({"type": "node_status", "node_id": node_id, "status": "running"}),
+            loop,
+        ).result(timeout=5)
+
+    def on_done(node_id: str, result: dict[str, Any]) -> None:
+        serialized = serialize_node_outputs(result)
+        asyncio.run_coroutine_threadsafe(
+            send({"type": "node_status", "node_id": node_id, "status": "success", "output": serialized}),
+            loop,
+        ).result(timeout=5)
+
+    def on_error(node_id: str, error: str) -> None:
+        asyncio.run_coroutine_threadsafe(
+            send({"type": "node_status", "node_id": node_id, "status": "error", "error": error}),
+            loop,
+        ).result(timeout=5)
+
+    await send({"type": "execution_start", "node_count": len(pipeline.nodes)})
+
+    try:
+        await loop.run_in_executor(
+            None,
+            lambda: executor.execute(
+                pipeline,
+                context={"project_path": data.get("project_path", "")},
+                on_node_start=on_start,
+                on_node_done=on_done,
+                on_node_error=on_error,
+            ),
+        )
+        await send({"type": "execution_done"})
+    except DAGExecutionError as exc:
+        await send({"type": "execution_error", "node_id": exc.node_id, "error": exc.message})
+    except Exception as exc:
+        await send({"type": "execution_error", "error": str(exc)})

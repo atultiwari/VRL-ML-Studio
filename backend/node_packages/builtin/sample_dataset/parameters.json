@@ -1,0 +1,10 @@
+[
+  {
+    "id": "dataset",
+    "label": "Dataset",
+    "type": "select",
+    "default": "iris",
+    "options": ["iris", "titanic", "housing", "diabetes"],
+    "tier": "basic"
+  }
+]

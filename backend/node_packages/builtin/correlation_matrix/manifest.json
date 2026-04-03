@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.correlation_matrix",
+  "name": "Correlation Matrix",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Computes and displays a heatmap of pairwise correlations between numeric columns using Pearson, Spearman, or Kendall method.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Correlation Heatmap" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

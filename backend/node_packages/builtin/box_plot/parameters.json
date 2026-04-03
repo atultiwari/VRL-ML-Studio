@@ -1,0 +1,9 @@
+[
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  }
+]

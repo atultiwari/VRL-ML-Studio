@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.box_plot",
+  "name": "Box Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Displays box plots with outlier points for selected numeric columns to visualize distributions and outliers.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Box Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

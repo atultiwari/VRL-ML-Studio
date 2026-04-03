@@ -1,0 +1,16 @@
+{
+  "id": "vrl.core.sample_dataset",
+  "name": "Sample Dataset",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.input",
+  "description": "Load one of the built-in sample datasets: iris, titanic, housing (California), or diabetes.",
+  "inputs": [],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

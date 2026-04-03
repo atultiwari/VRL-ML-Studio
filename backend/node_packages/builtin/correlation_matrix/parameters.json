@@ -1,0 +1,10 @@
+[
+  {
+    "id": "method",
+    "label": "Method",
+    "type": "select",
+    "default": "pearson",
+    "options": ["pearson", "spearman", "kendall"],
+    "tier": "basic"
+  }
+]

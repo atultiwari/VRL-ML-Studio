@@ -69,7 +69,7 @@ class DAGExecutor:
                 outputs[node_id] = cached
                 logger.info("Node '%s' — using cached output", node_id)
                 if on_node_done:
-                    on_node_done(node_id)
+                    on_node_done(node_id, cached)
                 continue
 
             inputs = self._build_inputs(node_id, pipeline.edges, outputs)
@@ -93,7 +93,7 @@ class DAGExecutor:
             outputs[node_id] = result
 
             if on_node_done:
-                on_node_done(node_id)
+                on_node_done(node_id, result)
 
         return outputs
 

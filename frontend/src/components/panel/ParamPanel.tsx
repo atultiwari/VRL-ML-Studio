@@ -1,21 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { BookOpen, Settings, Sliders, X } from 'lucide-react'
+import { BookOpen, Loader2, Settings, Sliders, Upload, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buildDefaultValues, buildParamSchema } from '@/lib/paramSchema'
 import type { ParameterSpec } from '@/lib/types'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
 import { ParamControl } from './ParamControl'
+import { api } from '@/lib/api'
 
 type Tab = 'basic' | 'advanced' | 'help'
 
 export function ParamPanel() {
-  const selectedNodeId  = useUIStore(s => s.selectedNodeId)
+  const selectedNodeId    = useUIStore(s => s.selectedNodeId)
   const setSelectedNodeId = useUIStore(s => s.setSelectedNodeId)
-  const nodes           = usePipelineStore(s => s.nodes)
-  const updateNodeParams = usePipelineStore(s => s.updateNodeParams)
+  const nodes             = usePipelineStore(s => s.nodes)
+  const updateNodeParams  = usePipelineStore(s => s.updateNodeParams)
 
   const node = useMemo(
     () => nodes.find(n => n.id === selectedNodeId) ?? null,
@@ -23,6 +24,35 @@ export function ParamPanel() {
   )
 
   const [activeTab, setActiveTab] = useState<Tab>('basic')
+
+  // ── File upload (for csv_loader / excel_loader) ────────────────────────
+  const fileInputRef  = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const hasFilePath = node?.data.manifest.parameters.some(
+    p => p.id === 'file_path' && p.tier === 'hidden'
+  ) ?? false
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    if (!selectedNodeId) return
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const { data } = await api.post<{ path: string; name: string }>('/upload', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      const current = usePipelineStore.getState().nodes.find(n => n.id === selectedNodeId)
+      updateNodeParams(selectedNodeId, {
+        ...current?.data.parameters,
+        file_path: data.path,
+        file_name: data.name,
+      })
+    } catch (err) {
+      console.error('Upload failed', err)
+    } finally {
+      setUploading(false)
+    }
+  }, [selectedNodeId, updateNodeParams])
 
   const manifest   = node?.data.manifest
   const params     = manifest?.parameters ?? []
@@ -124,6 +154,39 @@ export function ParamPanel() {
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
+
+      {/* File upload (csv_loader / excel_loader) */}
+      {hasFilePath && (
+        <div className="border-b border-border px-3 py-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.tsv,.xlsx,.xls"
+            className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f) }}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className={cn(
+              'flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border py-2 text-xs',
+              'text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground',
+              uploading && 'opacity-60'
+            )}
+          >
+            {uploading
+              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              : <Upload className="h-3.5 w-3.5" />
+            }
+            {uploading
+              ? 'Uploading…'
+              : node?.data.parameters?.file_name
+                ? String(node.data.parameters.file_name)
+                : 'Choose file…'
+            }
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-border">
