@@ -4,6 +4,7 @@ import ReactFlow, {
   BackgroundVariant,
   Controls,
   MiniMap,
+  SelectionMode,
   type Connection,
   type NodeMouseHandler,
   type ReactFlowInstance,
@@ -120,6 +121,9 @@ export function Canvas({ manifests }: CanvasProps) {
         isValidConnection={isValidConnection}
         deleteKeyCode={['Backspace', 'Delete']}
         multiSelectionKeyCode="Shift"
+        selectionOnDrag
+        selectionMode={SelectionMode.Partial}
+        panOnDrag={[1, 2]}
         fitView
         fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
         proOptions={{ hideAttribution: true }}

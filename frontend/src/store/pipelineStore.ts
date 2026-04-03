@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import {
   applyNodeChanges,
   applyEdgeChanges,
@@ -67,7 +66,6 @@ interface PipelineStore {
 // ── Store implementation ──────────────────────────────────────────────────────
 
 export const usePipelineStore = create<PipelineStore>()(
-  persist(
     (set, get) => ({
       nodes: [],
       edges: [],
@@ -204,11 +202,5 @@ export const usePipelineStore = create<PipelineStore>()(
         get().pushSnapshot()
         set({ nodes: [], edges: [] })
       },
-    }),
-    {
-      name: 'vrl-pipeline-v1',
-      // Only persist canvas state, not undo/redo history
-      partialize: s => ({ nodes: s.nodes, edges: s.edges }),
-    }
-  )
+    })
 )

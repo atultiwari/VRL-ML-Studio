@@ -81,7 +81,7 @@ export function ParamPanel() {
   const schema   = useMemo(() => buildParamSchema(params), [params])
   const defaults = useMemo(() => buildDefaultValues(params), [params])
 
-  const { watch, reset, formState: { errors } } = useForm<Record<string, unknown>>({
+  const { watch, reset, setValue, formState: { errors } } = useForm<Record<string, unknown>>({
     resolver: zodResolver(schema),
     defaultValues: { ...defaults, ...node?.data.parameters },
   })
@@ -122,10 +122,8 @@ export function ParamPanel() {
             spec={spec}
             value={watch(spec.id)}
             onChange={val => {
-              if (selectedNodeId) {
-                const current = watch()
-                updateNodeParams(selectedNodeId, { ...current, [spec.id]: val })
-              }
+              // Update form state first (so watch() returns the new value immediately)
+              setValue(spec.id, val, { shouldValidate: true })
             }}
             error={(errors[spec.id]?.message as string | undefined)}
             columns={upstreamColumns}
