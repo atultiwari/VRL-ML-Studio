@@ -1,0 +1,24 @@
+[
+  {
+    "id": "method",
+    "label": "Encoding Method",
+    "type": "select",
+    "options": ["onehot", "label", "ordinal"],
+    "default": "onehot",
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "drop_first",
+    "label": "Drop First (One-Hot)",
+    "type": "bool",
+    "default": true,
+    "tier": "advanced"
+  }
+]

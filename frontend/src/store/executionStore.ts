@@ -20,12 +20,19 @@ export interface MetricsOutput {
   data: Record<string, unknown>
 }
 
+export interface SplitDataOutput {
+  type: 'split_data'
+  target_col: string | null
+  train: DataFrameOutput
+  test: DataFrameOutput
+}
+
 export interface OpaqueOutput {
   type: 'opaque'
   repr: string
 }
 
-export type NodeOutput = DataFrameOutput | PlotOutput | MetricsOutput | OpaqueOutput
+export type NodeOutput = DataFrameOutput | PlotOutput | MetricsOutput | SplitDataOutput | OpaqueOutput
 
 // Map from portId → output
 export type PortOutputMap = Record<string, NodeOutput>

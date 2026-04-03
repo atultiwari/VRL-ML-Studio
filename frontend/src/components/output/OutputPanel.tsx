@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { BarChart2, Table, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useExecutionStore, type NodeOutput } from '@/store/executionStore'
@@ -96,12 +96,48 @@ export function OutputPanel() {
           </div>
         )}
 
+        {output?.type === 'split_data' && (
+          <SplitDataViewer output={output} />
+        )}
+
         {output?.type === 'opaque' && (
           <p className="m-auto text-xs text-muted-foreground">
             {output.repr} (not previewable)
           </p>
         )}
       </div>
+    </div>
+  )
+}
+
+// ── SplitData viewer (train/test tabs) ──────────────────────────────────────
+
+function SplitDataViewer({ output }: { output: import('@/store/executionStore').SplitDataOutput }) {
+  const [tab, setTab] = useState<'train' | 'test'>('train')
+  const df = tab === 'train' ? output.train : output.test
+
+  return (
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex items-center gap-1 border-b border-border px-3 py-1">
+        {(['train', 'test'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={cn(
+              'rounded px-2 py-0.5 text-[11px] font-medium transition-colors',
+              tab === t ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            {t === 'train' ? 'Train' : 'Test'} ({df.shape[0]} × {df.shape[1]})
+          </button>
+        ))}
+        {output.target_col && (
+          <span className="ml-2 text-[10px] text-muted-foreground">
+            target: <span className="font-medium text-foreground">{output.target_col}</span>
+          </span>
+        )}
+      </div>
+      <DataFrameTable output={df} />
     </div>
   )
 }

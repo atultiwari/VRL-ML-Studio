@@ -1,0 +1,17 @@
+[
+  {
+    "id": "subset_columns",
+    "label": "Subset Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "keep",
+    "label": "Keep",
+    "type": "select",
+    "options": ["first", "last", "none"],
+    "default": "first",
+    "tier": "basic"
+  }
+]

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { buildDefaultValues, buildParamSchema } from '@/lib/paramSchema'
 import type { ParameterSpec } from '@/lib/types'
 import { usePipelineStore } from '@/store/pipelineStore'
+import { useExecutionStore, type DataFrameOutput } from '@/store/executionStore'
 import { useUIStore } from '@/store/uiStore'
 import { ParamControl } from './ParamControl'
 import { api } from '@/lib/api'
@@ -16,12 +17,30 @@ export function ParamPanel() {
   const selectedNodeId    = useUIStore(s => s.selectedNodeId)
   const setSelectedNodeId = useUIStore(s => s.setSelectedNodeId)
   const nodes             = usePipelineStore(s => s.nodes)
+  const edges             = usePipelineStore(s => s.edges)
   const updateNodeParams  = usePipelineStore(s => s.updateNodeParams)
+  const nodeOutputs       = useExecutionStore(s => s.nodeOutputs)
 
   const node = useMemo(
     () => nodes.find(n => n.id === selectedNodeId) ?? null,
     [nodes, selectedNodeId]
   )
+
+  // Resolve upstream DataFrame columns for column_select / multicolumn_select controls
+  const upstreamColumns = useMemo(() => {
+    if (!selectedNodeId) return []
+    // Find the edge feeding into this node's dataframe_in port
+    const inEdge = edges.find(e => e.target === selectedNodeId && (e.targetHandle === 'dataframe_in'))
+    if (!inEdge) return []
+    const sourceOutputs = nodeOutputs[inEdge.source]
+    if (!sourceOutputs) return []
+    const portOutput = sourceOutputs[inEdge.sourceHandle ?? '']
+    if (!portOutput) return []
+    if (portOutput.type === 'dataframe') {
+      return (portOutput as DataFrameOutput).columns.map(c => c.name)
+    }
+    return []
+  }, [selectedNodeId, edges, nodeOutputs])
 
   const [activeTab, setActiveTab] = useState<Tab>('basic')
 
@@ -103,14 +122,13 @@ export function ParamPanel() {
             spec={spec}
             value={watch(spec.id)}
             onChange={val => {
-              // Update via react-hook-form's internal setValue equivalent
-              // We use the form watch + direct store update pattern
               if (selectedNodeId) {
                 const current = watch()
                 updateNodeParams(selectedNodeId, { ...current, [spec.id]: val })
               }
             }}
             error={(errors[spec.id]?.message as string | undefined)}
+            columns={upstreamColumns}
           />
         ))}
       </div>

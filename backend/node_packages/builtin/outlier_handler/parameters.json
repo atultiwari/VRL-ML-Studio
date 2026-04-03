@@ -1,0 +1,34 @@
+[
+  {
+    "id": "method",
+    "label": "Detection Method",
+    "type": "select",
+    "options": ["iqr", "zscore"],
+    "default": "iqr",
+    "tier": "basic"
+  },
+  {
+    "id": "action",
+    "label": "Action",
+    "type": "select",
+    "options": ["remove", "cap", "flag"],
+    "default": "cap",
+    "tier": "basic"
+  },
+  {
+    "id": "threshold",
+    "label": "Threshold",
+    "type": "float",
+    "default": 1.5,
+    "min": 0.1,
+    "max": 5.0,
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "method",
+    "label": "Scaling Method",
+    "type": "select",
+    "options": ["standard", "minmax", "robust"],
+    "default": "standard",
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  }
+]

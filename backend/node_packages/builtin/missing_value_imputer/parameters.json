@@ -1,0 +1,24 @@
+[
+  {
+    "id": "strategy",
+    "label": "Strategy",
+    "type": "select",
+    "options": ["mean", "median", "most_frequent", "constant"],
+    "default": "mean",
+    "tier": "basic"
+  },
+  {
+    "id": "fill_value",
+    "label": "Fill Value",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  }
+]

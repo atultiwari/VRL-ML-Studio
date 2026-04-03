@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.missing_value_imputer",
+  "name": "Missing Value Imputer",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Impute missing values using mean, median, most frequent, or a constant fill value.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Imputed Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

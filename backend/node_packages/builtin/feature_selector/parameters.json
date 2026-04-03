@@ -1,0 +1,33 @@
+[
+  {
+    "id": "method",
+    "label": "Selection Method",
+    "type": "select",
+    "options": ["manual", "variance", "correlation"],
+    "default": "manual",
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns to Keep",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "threshold",
+    "label": "Threshold",
+    "type": "float",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0,
+    "tier": "basic"
+  },
+  {
+    "id": "correlation_target",
+    "label": "Correlation Target Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "advanced"
+  }
+]

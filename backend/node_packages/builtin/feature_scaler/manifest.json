@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.feature_scaler",
+  "name": "Feature Scaler",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Scale numeric features using standard, min-max, or robust scaling.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Scaled Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

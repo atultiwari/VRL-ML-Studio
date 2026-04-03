@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.train_test_splitter",
+  "name": "Train-Test Splitter",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Split a dataset into training and testing subsets with optional stratification.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "split_data_out", "type": "SplitData", "label": "Train/Test Split" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.feature_selector",
+  "name": "Feature Selector",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Select features manually, by variance threshold, or by correlation to a target column.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Selected Features" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "id": "column",
+    "label": "Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  },
+  {
+    "id": "target_type",
+    "label": "Target Type",
+    "type": "select",
+    "options": ["int", "float", "str", "bool", "category", "datetime"],
+    "default": "float",
+    "tier": "basic"
+  },
+  {
+    "id": "errors",
+    "label": "Error Handling",
+    "type": "select",
+    "options": ["raise", "coerce", "ignore"],
+    "default": "coerce",
+    "tier": "advanced"
+  }
+]

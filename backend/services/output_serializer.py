@@ -31,6 +31,15 @@ def _serialize_value(value: Any) -> dict[str, Any]:
     except ImportError:
         pass
 
+    # SplitData dict (train/test DataFrames from train_test_splitter)
+    if isinstance(value, dict) and "train" in value and "test" in value:
+        try:
+            import pandas as pd
+            if isinstance(value["train"], pd.DataFrame) and isinstance(value["test"], pd.DataFrame):
+                return _serialize_split_data(value)
+        except ImportError:
+            pass
+
     # Plotly figure dict (has "data" + "layout" keys at minimum)
     if isinstance(value, dict) and "data" in value and "layout" in value:
         return {"type": "plot", "spec": value}
@@ -64,6 +73,18 @@ def _serialize_dataframe(df: "Any") -> dict[str, Any]:
         ],
         "data": preview_clean.values.tolist(),
         "shape": list(df.shape),
+    }
+
+
+def _serialize_split_data(split: dict[str, Any]) -> dict[str, Any]:
+    """Serialize a SplitData dict (train/test pair) for frontend preview."""
+    train_info = _serialize_dataframe(split["train"])
+    test_info = _serialize_dataframe(split["test"])
+    return {
+        "type": "split_data",
+        "target_col": split.get("target_col"),
+        "train": train_info,
+        "test": test_info,
     }
 
 

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "columns",
+    "label": "Columns to Drop",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  }
+]

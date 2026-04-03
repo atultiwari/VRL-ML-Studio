@@ -129,10 +129,10 @@ This project is built in 12 stages. Each stage is gate-approved before the next 
 |---|---|---|
 | 1 | Scaffolding + Node Package Foundation | ✅ Complete |
 | 2 | Canvas Core (React Flow, drag-drop, undo/redo) | ✅ Complete |
-| 3 | Parameter Panel (dynamic form from parameters.json) | 🔄 Next |
-| 4 | Data Input & EDA Nodes | Pending |
-| 5 | Preprocessing Nodes | Pending |
-| 6 | Classification Models & Evaluation | Pending |
+| 3 | Parameter Panel (dynamic form from parameters.json) | ✅ Complete |
+| 4 | Data Input & EDA Nodes | ✅ Complete |
+| 5 | Preprocessing Nodes | ✅ Complete |
+| 6 | Classification Models & Evaluation | 🔄 Next |
 | 7 | Regression Models & Evaluation | Pending |
 | 8 | Unsupervised Models & Evaluation | Pending |
 | 9 | Git-Based Project Management | Pending |
@@ -140,15 +140,16 @@ This project is built in 12 stages. Each stage is gate-approved before the next 
 | 11 | Node Package Import/Export UI | Pending |
 | 12 | Polish, Testing & Documentation | Pending |
 
-### Stage 2 — What's working now
+### Stage 5 — What's working now
 
-- Drag any node from the sidebar onto the canvas
-- Connect output → input ports (type-safe: only matching port types connect)
-- Rename a node by double-clicking its title
-- Undo / redo with Ctrl+Z / Ctrl+Y (or toolbar buttons)
-- Delete selected nodes/edges with Backspace or Delete
-- Minimap + zoom/pan controls
-- Pipeline persists to localStorage — survives page refresh
+All previous stages plus:
+
+- **9 preprocessing nodes**: Missing Value Imputer, Encoder, Feature Scaler, Feature Selector, Train-Test Splitter, Outlier Handler, Column Dropper, Type Caster, Duplicate Remover
+- **Full preprocessing chain** executes end-to-end: CSV → Imputer → Encoder → Scaler → Feature Selector → Train-Test Splitter
+- **Column select controls** populated from upstream DataFrame columns after execution
+- **SplitData preview** shows train/test splits with row counts and target column indicator
+- **Cache-aware execution**: re-running unchanged nodes uses cached output; parameter changes invalidate downstream cache
+- **62 backend tests** passing (34 new preprocessing tests)
 
 ---
 
