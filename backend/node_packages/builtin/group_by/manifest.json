@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.group_by",
+  "name": "Group By",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Group rows by one or more columns and compute aggregate statistics (mean, sum, count, min, max, median, std) on numeric columns.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Grouped Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

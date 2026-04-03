@@ -1,0 +1,43 @@
+[
+  {
+    "id": "loss",
+    "label": "Loss Function",
+    "type": "select",
+    "options": ["squared_error", "huber", "epsilon_insensitive", "squared_epsilon_insensitive"],
+    "default": "squared_error",
+    "tier": "basic"
+  },
+  {
+    "id": "alpha",
+    "label": "Regularization Strength",
+    "type": "float",
+    "default": 0.0001,
+    "min": 0.0000001,
+    "max": 1.0,
+    "tier": "basic"
+  },
+  {
+    "id": "max_iter",
+    "label": "Max Iterations",
+    "type": "int",
+    "default": 1000,
+    "min": 100,
+    "max": 10000,
+    "tier": "advanced"
+  },
+  {
+    "id": "penalty",
+    "label": "Penalty",
+    "type": "select",
+    "options": ["l2", "l1", "elasticnet"],
+    "default": "l2",
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "index_col",
+    "label": "Index Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "columns_col",
+    "label": "Columns Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "values_col",
+    "label": "Values Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "aggfunc",
+    "label": "Aggregation Function",
+    "type": "select",
+    "options": ["mean", "sum", "count", "min", "max", "median", "first", "last"],
+    "default": "mean",
+    "tier": "basic"
+  },
+  {
+    "id": "fill_value",
+    "label": "Fill Value",
+    "type": "float_or_null",
+    "default": null,
+    "tier": "advanced"
+  },
+  {
+    "id": "margins",
+    "label": "Add Totals",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

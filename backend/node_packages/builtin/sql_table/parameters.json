@@ -1,0 +1,31 @@
+[
+  {
+    "id": "db_type",
+    "label": "Database Type",
+    "type": "select",
+    "options": ["sqlite", "postgresql", "mysql"],
+    "default": "sqlite",
+    "tier": "basic"
+  },
+  {
+    "id": "connection_string",
+    "label": "Connection String",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "query",
+    "label": "SQL Query",
+    "type": "str",
+    "default": "SELECT * FROM table_name LIMIT 1000",
+    "tier": "basic"
+  },
+  {
+    "id": "table_name",
+    "label": "Table Name (overrides query)",
+    "type": "str",
+    "default": "",
+    "tier": "advanced"
+  }
+]

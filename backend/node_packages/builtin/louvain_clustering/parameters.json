@@ -1,0 +1,34 @@
+[
+  {
+    "id": "n_clusters",
+    "label": "Number of Clusters",
+    "type": "int",
+    "default": 3,
+    "min": 2,
+    "max": 50,
+    "tier": "basic"
+  },
+  {
+    "id": "n_neighbors",
+    "label": "Number of Neighbors (k)",
+    "type": "int",
+    "default": 10,
+    "min": 2,
+    "max": 100,
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns to Use",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

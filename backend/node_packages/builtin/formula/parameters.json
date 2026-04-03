@@ -1,0 +1,24 @@
+[
+  {
+    "id": "new_column_name",
+    "label": "New Column Name",
+    "type": "str",
+    "default": "new_col",
+    "tier": "basic"
+  },
+  {
+    "id": "expression",
+    "label": "Expression",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "dtype",
+    "label": "Output Type",
+    "type": "select",
+    "options": ["auto", "int", "float", "str", "bool"],
+    "default": "auto",
+    "tier": "advanced"
+  }
+]

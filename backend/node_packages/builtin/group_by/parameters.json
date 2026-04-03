@@ -1,0 +1,24 @@
+[
+  {
+    "id": "group_columns",
+    "label": "Group By Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "aggregation",
+    "label": "Aggregation",
+    "type": "select",
+    "options": ["mean", "sum", "count", "min", "max", "median", "std", "first", "last"],
+    "default": "mean",
+    "tier": "basic"
+  },
+  {
+    "id": "value_columns",
+    "label": "Value Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "advanced"
+  }
+]

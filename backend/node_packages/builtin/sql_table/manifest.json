@@ -1,0 +1,16 @@
+{
+  "id": "vrl.core.sql_table",
+  "name": "SQL Table",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.input",
+  "description": "Load data from a SQL database (SQLite, PostgreSQL, or MySQL). Provide a connection string and a SQL query or table name.",
+  "inputs": [],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

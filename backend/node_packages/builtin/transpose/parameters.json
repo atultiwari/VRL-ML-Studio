@@ -1,0 +1,16 @@
+[
+  {
+    "id": "header_column",
+    "label": "Header Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "reset_index",
+    "label": "Reset Index",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  }
+]

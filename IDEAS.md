@@ -88,19 +88,18 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 | `vrl.core.calibration_plot` | Calibration Plot | evaluation.classification | Reliability diagram with Brier score |
 | `vrl.core.silhouette_plot` | Silhouette Plot | evaluation.clustering | Per-sample cluster quality visualization |
 
-### Still Proposed
+### Implemented — Low Priority (8 nodes)
 
-### Low Priority
-
-| Widget | Category | Description |
-|---|---|---|
-| SGD Classifier/Regressor | Model | Stochastic Gradient Descent (large dataset friendly) |
-| Louvain Clustering | Unsupervised | Graph-based community detection clustering |
-| Transpose | Transform | Swap rows and columns |
-| Group By | Transform | SQL-style group-by aggregation |
-| Pivot Table | Transform | Reshape data into pivot format |
-| Formula | Transform | Computed columns via expressions |
-| SQL Table | Data | Direct database connector (PostgreSQL, MySQL, SQLite) |
+| Node ID | Name | Category | Description |
+|---|---|---|---|
+| `vrl.core.transpose` | Transpose | preprocessing | Swap rows and columns |
+| `vrl.core.group_by` | Group By | preprocessing | SQL-style group-by aggregation |
+| `vrl.core.pivot_table` | Pivot Table | preprocessing | Reshape data into pivot format |
+| `vrl.core.formula` | Formula | preprocessing | Computed columns via expressions |
+| `vrl.core.sgd_classifier` | SGD Classifier | model.classification | Stochastic Gradient Descent classifier |
+| `vrl.core.sgd_regressor` | SGD Regressor | model.regression | Stochastic Gradient Descent regressor |
+| `vrl.core.louvain_clustering` | Louvain Clustering | model.unsupervised | Graph-based clustering (spectral + kNN graph) |
+| `vrl.core.sql_table` | SQL Table | data.input | Database connector (SQLite, PostgreSQL, MySQL) |
 
 ---
 
@@ -109,4 +108,4 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 _Completed ideas move here with implementation notes._
 
 - **Idea 1 (Orange Naming)** — Completed 2026-04-03. 27 nodes renamed.
-- **Idea 2 (New Nodes)** — Completed 2026-04-04. 21 Orange-inspired nodes added (total: 73 nodes).
+- **Idea 2 (New Nodes)** — Completed 2026-04-04. 29 Orange-inspired nodes added (total: 81 nodes).

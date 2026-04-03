@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.louvain_clustering",
+  "name": "Louvain Clustering",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.unsupervised",
+  "description": "Community detection clustering using the Louvain algorithm on a k-nearest neighbors graph. Groups similar samples into communities.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Clustered Data" },
+    { "id": "plot_out", "type": "Plot", "label": "Cluster Plot" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.formula",
+  "name": "Formula",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Create new computed columns using Python expressions. Reference existing columns by name. Supports arithmetic, string operations, and numpy functions.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Dataset with New Column" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}
