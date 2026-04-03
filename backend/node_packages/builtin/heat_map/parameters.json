@@ -1,0 +1,61 @@
+[
+  {
+    "id": "mode",
+    "label": "Mode",
+    "type": "select",
+    "options": ["raw", "zscore", "pivot"],
+    "default": "raw",
+    "tier": "basic"
+  },
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "show_values",
+    "label": "Show Values in Cells",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  },
+  {
+    "id": "pivot_index",
+    "label": "Pivot Row Index",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "pivot_columns",
+    "label": "Pivot Column Headers",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "pivot_values",
+    "label": "Pivot Values",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "pivot_aggfunc",
+    "label": "Pivot Aggregation",
+    "type": "select",
+    "options": ["mean", "sum", "count", "median"],
+    "default": "mean",
+    "tier": "advanced"
+  },
+  {
+    "id": "colorscale",
+    "label": "Color Scale",
+    "type": "select",
+    "options": ["Viridis", "RdBu", "YlOrRd", "Blues", "Greens", "Plasma"],
+    "default": "Viridis",
+    "tier": "advanced"
+  }
+]

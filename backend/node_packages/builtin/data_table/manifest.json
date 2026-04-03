@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.data_table",
+  "name": "Data Table",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "data.eda",
+  "description": "Display a detailed interactive view of the dataset including shape, column types, memory usage, and a sortable preview of all rows.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Input Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Data" },
+    { "id": "metrics_out", "type": "Metrics", "label": "Table Info" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

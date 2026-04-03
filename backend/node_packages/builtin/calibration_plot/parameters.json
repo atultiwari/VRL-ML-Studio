@@ -1,0 +1,26 @@
+[
+  {
+    "id": "target_col",
+    "label": "Target Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "n_bins",
+    "label": "Number of Bins",
+    "type": "int",
+    "default": 10,
+    "min": 3,
+    "max": 50,
+    "tier": "basic"
+  },
+  {
+    "id": "strategy",
+    "label": "Binning Strategy",
+    "type": "select",
+    "options": ["uniform", "quantile"],
+    "default": "uniform",
+    "tier": "advanced"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "mode",
+    "label": "Mode",
+    "type": "select",
+    "options": ["designate", "from_expression"],
+    "default": "designate",
+    "tier": "basic"
+  },
+  {
+    "id": "target_col",
+    "label": "Target Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "new_col_name",
+    "label": "New Column Name",
+    "type": "str",
+    "default": "target",
+    "tier": "basic"
+  },
+  {
+    "id": "expression",
+    "label": "Expression",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "class_labels",
+    "label": "Class Labels (comma-separated)",
+    "type": "str",
+    "default": "0,1",
+    "tier": "advanced"
+  }
+]

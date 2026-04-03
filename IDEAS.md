@@ -75,19 +75,20 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 | `vrl.core.bar_plot` | Bar Plot | data.eda | Bar chart with count/mean/sum/median aggregation |
 | `vrl.core.line_plot` | Line Plot | data.eda | Line chart for trends and time series |
 
+### Implemented — Medium Priority (8 nodes)
+
+| Node ID | Name | Category | Description |
+|---|---|---|---|
+| `vrl.core.create_class` | Create Class | preprocessing | Designate/create target variable column |
+| `vrl.core.data_table` | Data Table | data.eda | Interactive data viewer with shape, dtypes, memory info |
+| `vrl.core.heat_map` | Heat Map | data.eda | General-purpose heatmap (raw, z-score, pivot modes) |
+| `vrl.core.mlp_classifier` | Neural Network | model.classification | MLP classifier for tabular data |
+| `vrl.core.mlp_regressor` | Neural Network (Regressor) | model.regression | MLP regressor for tabular data |
+| `vrl.core.stacking` | Stacking | model.classification | Ensemble meta-learner combining base classifiers |
+| `vrl.core.calibration_plot` | Calibration Plot | evaluation.classification | Reliability diagram with Brier score |
+| `vrl.core.silhouette_plot` | Silhouette Plot | evaluation.clustering | Per-sample cluster quality visualization |
+
 ### Still Proposed
-
-#### Medium Priority
-
-| Widget | Category | Description |
-|---|---|---|
-| Create Class | Transform | Designate/change the target variable column |
-| Data Table | Data | Dedicated interactive data viewer (separate from Data Info) |
-| Heat Map | Visualize | General-purpose heatmap (beyond correlation) |
-| Neural Network (MLP) | Model | sklearn MLPClassifier/MLPRegressor for tabular data |
-| Stacking | Model | Ensemble meta-learner combining multiple base models |
-| Calibration Plot | Evaluate | Probability calibration visualization |
-| Silhouette Plot | Evaluate | Per-sample cluster quality visualization |
 
 ### Low Priority
 
@@ -108,4 +109,4 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 _Completed ideas move here with implementation notes._
 
 - **Idea 1 (Orange Naming)** — Completed 2026-04-03. 27 nodes renamed.
-- **Idea 2 (New Nodes)** — Completed 2026-04-03. 13 Orange-inspired nodes added (total: 65 nodes).
+- **Idea 2 (New Nodes)** — Completed 2026-04-04. 21 Orange-inspired nodes added (total: 73 nodes).

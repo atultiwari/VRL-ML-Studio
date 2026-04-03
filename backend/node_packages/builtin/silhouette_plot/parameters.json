@@ -1,0 +1,24 @@
+[
+  {
+    "id": "cluster_col",
+    "label": "Cluster Column",
+    "type": "column_select",
+    "default": "cluster",
+    "tier": "basic"
+  },
+  {
+    "id": "feature_cols",
+    "label": "Feature Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "advanced"
+  },
+  {
+    "id": "metric",
+    "label": "Distance Metric",
+    "type": "select",
+    "options": ["euclidean", "manhattan", "cosine"],
+    "default": "euclidean",
+    "tier": "advanced"
+  }
+]

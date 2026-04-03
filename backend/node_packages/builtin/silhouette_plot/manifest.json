@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.silhouette_plot",
+  "name": "Silhouette Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.clustering",
+  "description": "Visualize the silhouette coefficient for each sample in a clustering result. Samples near +1 are well-matched to their cluster; near -1 are likely misassigned.",
+  "inputs": [
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Clustered Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Silhouette Plot" },
+    { "id": "metrics_out", "type": "Metrics", "label": "Silhouette Scores" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

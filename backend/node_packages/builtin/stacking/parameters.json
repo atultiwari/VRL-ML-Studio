@@ -1,0 +1,48 @@
+[
+  {
+    "id": "base_estimators",
+    "label": "Base Classifiers",
+    "type": "multiselect",
+    "options": [
+      "logistic_regression",
+      "decision_tree",
+      "random_forest",
+      "knn",
+      "naive_bayes",
+      "svm"
+    ],
+    "default": ["logistic_regression", "decision_tree", "random_forest"],
+    "tier": "basic"
+  },
+  {
+    "id": "final_estimator",
+    "label": "Meta-Learner",
+    "type": "select",
+    "options": ["logistic_regression", "random_forest", "gradient_boosting"],
+    "default": "logistic_regression",
+    "tier": "basic"
+  },
+  {
+    "id": "cv",
+    "label": "Cross-Validation Folds",
+    "type": "int",
+    "default": 5,
+    "min": 2,
+    "max": 10,
+    "tier": "basic"
+  },
+  {
+    "id": "passthrough",
+    "label": "Passthrough Original Features",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

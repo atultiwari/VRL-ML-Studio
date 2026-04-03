@@ -1,0 +1,20 @@
+{
+  "id": "vrl.core.calibration_plot",
+  "name": "Calibration Plot",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Display a calibration curve (reliability diagram) showing how well predicted probabilities match actual outcomes. A perfectly calibrated model follows the diagonal.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Calibration Curve" },
+    { "id": "metrics_out", "type": "Metrics", "label": "Calibration Metrics" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

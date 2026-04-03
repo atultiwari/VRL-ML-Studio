@@ -1,0 +1,60 @@
+[
+  {
+    "id": "hidden_layers",
+    "label": "Hidden Layer Sizes",
+    "type": "str",
+    "default": "100,50",
+    "description": "Comma-separated layer sizes, e.g. \"100,50\" means two hidden layers of 100 and 50 neurons.",
+    "tier": "basic"
+  },
+  {
+    "id": "activation",
+    "label": "Activation Function",
+    "type": "select",
+    "options": ["relu", "tanh", "logistic", "identity"],
+    "default": "relu",
+    "tier": "basic"
+  },
+  {
+    "id": "solver",
+    "label": "Solver",
+    "type": "select",
+    "options": ["adam", "sgd", "lbfgs"],
+    "default": "adam",
+    "tier": "basic"
+  },
+  {
+    "id": "learning_rate_init",
+    "label": "Initial Learning Rate",
+    "type": "float",
+    "default": 0.001,
+    "min": 0.00001,
+    "max": 1.0,
+    "tier": "advanced"
+  },
+  {
+    "id": "max_iter",
+    "label": "Max Iterations",
+    "type": "int",
+    "default": 200,
+    "min": 10,
+    "max": 5000,
+    "tier": "advanced"
+  },
+  {
+    "id": "alpha",
+    "label": "L2 Regularization (Alpha)",
+    "type": "float",
+    "default": 0.0001,
+    "min": 0.0,
+    "max": 1.0,
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]
