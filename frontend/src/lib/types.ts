@@ -18,6 +18,27 @@ export const PORT_COLORS: Record<PortType, string> = {
   Plot:      '#f43f5e',  // rose
 }
 
+// ── Parameter spec (mirrors backend ParameterSpec) ───────────────────────────
+
+export type ParamType =
+  | 'int' | 'float' | 'str' | 'bool'
+  | 'select' | 'multiselect'
+  | 'int_or_null' | 'float_or_null'
+  | 'column_select' | 'multicolumn_select'
+
+export type ParamTier = 'basic' | 'advanced' | 'hidden'
+
+export interface ParameterSpec {
+  id: string
+  label: string
+  type: ParamType
+  default: unknown
+  min?: number | null
+  max?: number | null
+  options?: string[] | null
+  tier: ParamTier
+}
+
 // ── Node manifest (mirrors backend NodeEntry response) ────────────────────────
 
 export interface NodeManifestWithUI {
@@ -28,6 +49,7 @@ export interface NodeManifestWithUI {
   description: string
   inputs: PortSpec[]
   outputs: PortSpec[]
+  parameters: ParameterSpec[]
   icon: string
   color: string
   badge_text: string

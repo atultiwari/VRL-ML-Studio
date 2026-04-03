@@ -5,11 +5,13 @@ import ReactFlow, {
   Controls,
   MiniMap,
   type Connection,
+  type NodeMouseHandler,
   type ReactFlowInstance,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { NodeCard } from './NodeCard'
 import { usePipelineStore } from '@/store/pipelineStore'
+import { useUIStore } from '@/store/uiStore'
 import type { NodeManifestWithUI } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -30,8 +32,9 @@ export function Canvas({ manifests }: CanvasProps) {
   const onNodesChange = usePipelineStore(s => s.onNodesChange)
   const onEdgesChange = usePipelineStore(s => s.onEdgesChange)
   const onConnect     = usePipelineStore(s => s.onConnect)
-  const addNode       = usePipelineStore(s => s.addNode)
-  const pushSnapshot  = usePipelineStore(s => s.pushSnapshot)
+  const addNode           = usePipelineStore(s => s.addNode)
+  const pushSnapshot      = usePipelineStore(s => s.pushSnapshot)
+  const setSelectedNodeId = useUIStore(s => s.setSelectedNodeId)
 
   // Port-type validation: source type must equal target type
   const isValidConnection = useCallback(
@@ -76,6 +79,14 @@ export function Canvas({ manifests }: CanvasProps) {
     pushSnapshot()
   }, [pushSnapshot])
 
+  const onNodeClick: NodeMouseHandler = useCallback((_e, node) => {
+    setSelectedNodeId(node.id)
+  }, [setSelectedNodeId])
+
+  const onPaneClick = useCallback(() => {
+    setSelectedNodeId(null)
+  }, [setSelectedNodeId])
+
   return (
     <main
       className={cn('canvas-grid relative flex-1 overflow-hidden')}
@@ -89,6 +100,8 @@ export function Canvas({ manifests }: CanvasProps) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
+        onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
         onInit={instance => { rfInstanceRef.current = instance }}
         nodeTypes={NODE_TYPES}
         isValidConnection={isValidConnection}

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Canvas } from '@/components/canvas/Canvas'
+import { ParamPanel } from '@/components/panel/ParamPanel'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import { checkHealth } from '@/lib/api'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
 import { usePipelineStore } from '@/store/pipelineStore'
+import { useUIStore } from '@/store/uiStore'
 
 type BackendStatus = 'connecting' | 'online' | 'offline'
 
@@ -13,6 +15,7 @@ export function App() {
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
 
   const { manifests, loading, error } = useNodeRegistry()
+  const selectedNodeId = useUIStore(s => s.selectedNodeId)
 
   // Keyboard shortcuts for undo/redo
   const undo = usePipelineStore(s => s.undo)
@@ -61,6 +64,7 @@ export function App() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar manifests={manifests} loading={loading} error={error} />
         <Canvas manifests={manifests} />
+        {selectedNodeId && <ParamPanel />}
       </div>
     </div>
   )

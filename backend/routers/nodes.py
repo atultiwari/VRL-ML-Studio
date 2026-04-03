@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from core.logging import get_logger
-from models.node import PortSpec
+from models.node import ParameterSpec, PortSpec
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/nodes", tags=["nodes"])
@@ -18,6 +18,7 @@ class NodeEntry(BaseModel):
     description: str
     inputs: list[PortSpec]
     outputs: list[PortSpec]
+    parameters: list[ParameterSpec]
     icon: str
     color: str
     badge_text: str
@@ -41,6 +42,7 @@ async def list_nodes(request: Request) -> list[NodeEntry]:
                 description=m.description,
                 inputs=m.inputs,
                 outputs=m.outputs,
+                parameters=pkg.parameters,
                 icon=u.icon,
                 color=u.color,
                 badge_text=u.badge_text,
