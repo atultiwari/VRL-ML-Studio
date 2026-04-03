@@ -7,9 +7,10 @@ import type { PipelineJSON } from '@/lib/types'
 
 interface Props {
   onOpenProject: (pipeline: PipelineJSON) => void
+  onOpenWizard: () => void
 }
 
-export function ProjectDashboard({ onOpenProject }: Props) {
+export function ProjectDashboard({ onOpenProject, onOpenWizard }: Props) {
   const projects = useProjectStore(s => s.projectList)
   const loading = useProjectStore(s => s.loadingProjects)
   const fetchProjects = useProjectStore(s => s.fetchProjects)
@@ -118,6 +119,7 @@ export function ProjectDashboard({ onOpenProject }: Props) {
         <NewProjectDialog
           onClose={() => setShowNew(false)}
           onCreated={handleCreated}
+          onOpenWizard={() => { setShowNew(false); onOpenWizard() }}
         />
       )}
     </div>

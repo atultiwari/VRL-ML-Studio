@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2, X } from 'lucide-react'
+import { Loader2, Wand2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useProjectStore } from '@/store/projectStore'
 import type { PipelineJSON } from '@/lib/types'
@@ -7,9 +7,10 @@ import type { PipelineJSON } from '@/lib/types'
 interface Props {
   onClose: () => void
   onCreated: (pipeline: PipelineJSON) => void
+  onOpenWizard: () => void
 }
 
-export function NewProjectDialog({ onClose, onCreated }: Props) {
+export function NewProjectDialog({ onClose, onCreated, onOpenWizard }: Props) {
   const templates = useProjectStore(s => s.templates)
   const fetchTemplates = useProjectStore(s => s.fetchTemplates)
   const createProject = useProjectStore(s => s.createProject)
@@ -58,6 +59,32 @@ export function NewProjectDialog({ onClose, onCreated }: Props) {
 
         {/* Body */}
         <div className="flex flex-col gap-4 px-5 py-4">
+          {/* Smart Wizard CTA */}
+          <button
+            onClick={onOpenWizard}
+            className={cn(
+              'flex items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4',
+              'text-left transition-all hover:border-primary hover:bg-primary/10',
+              'group'
+            )}
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 group-hover:bg-primary/25 transition-colors">
+              <Wand2 className="h-4.5 w-4.5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Smart Wizard</p>
+              <p className="text-[10px] text-muted-foreground">
+                Guided step-by-step: dataset, features, preprocessing, model, evaluation
+              </p>
+            </div>
+          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[10px] text-muted-foreground">or create manually</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
           {/* Name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-foreground">Project Name *</label>
@@ -98,7 +125,7 @@ export function NewProjectDialog({ onClose, onCreated }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-foreground">Start from Template</label>
             <div className="flex flex-wrap gap-1.5">
-              {[{ id: 'blank', name: 'Blank', node_count: 0 }, ...templates].map(t => (
+              {[{ id: 'blank', name: 'Blank', node_count: 0 }, ...templates.filter(t => t.id !== 'blank')].map(t => (
                 <button
                   key={t.id}
                   onClick={() => setTemplate(t.id)}

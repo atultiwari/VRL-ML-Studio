@@ -103,9 +103,50 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 
 ---
 
+## Idea 3 — Smart Wizard + Duplicate Blank Template Fix
+
+**Status:** `done`
+
+**Origin:** Two items:
+1. **Bug**: "Blank" template appeared twice (both selected) in New Project dialog — backend returns `blank.json` AND frontend hardcoded a Blank entry.
+2. **Feature request**: Users new to ML need guided step-by-step pipeline building instead of a blank canvas.
+
+**Bug fix:**
+- Filtered backend templates to exclude `blank` before prepending hardcoded entry in `NewProjectDialog.tsx`.
+
+**Smart Wizard — what was done:**
+- Added `POST /dataset/preview` backend endpoint returning column metadata (name, dtype, missing count, unique count, is_numeric) + preview rows for sample datasets.
+- New Zustand store (`wizardStore.ts`) managing 7-step wizard state.
+- New `SmartWizard.tsx` component (full-screen overlay) with these steps:
+  1. **Dataset** — choose from 4 sample datasets (Iris, Titanic, Housing, Diabetes)
+  2. **Overview** — shows column table, dtypes, missing values, shape summary, row preview
+  3. **Target & Features** — target column selector, auto-detect classification/regression, feature column checkboxes
+  4. **Preprocessing** — imputation strategy, categorical encoding method, feature scaling
+  5. **Train/Test Split** — test size slider, stratification toggle, random seed
+  6. **Algorithm** — pick one or more algorithms (8 classification + 8 regression options)
+  7. **Review & Build** — summary table, builds pipeline JSON, creates project, auto-executes
+- Pipeline builder generates full DAG: Dataset → Select Columns → Impute → Encode → Scale → Split → Model(s) → Evaluation nodes
+- Classification pipelines get: Test & Score + Confusion Matrix + ROC Analysis per model
+- Regression pipelines get: Regression Report + Actual vs Predicted + Residual Plot per model
+- Smart Wizard CTA added to New Project dialog (above templates, with divider)
+- All steps navigable forward and backward after wizard completion (via step indicator)
+- Pipeline auto-executes after creation so results are immediately visible
+
+**Files changed:**
+- `backend/routers/project.py` — new `/dataset/preview` endpoint
+- `frontend/src/lib/api.ts` — `datasetPreview()` API client
+- `frontend/src/store/wizardStore.ts` — new store
+- `frontend/src/components/wizard/SmartWizard.tsx` — new component
+- `frontend/src/components/dashboard/NewProjectDialog.tsx` — bug fix + wizard CTA
+- `frontend/src/components/dashboard/ProjectDashboard.tsx` — pass `onOpenWizard` prop
+- `frontend/src/App.tsx` — added 'wizard' view type and handlers
+
+---
+
 ## Archive
 
 _Completed ideas move here with implementation notes._
 
 - **Idea 1 (Orange Naming)** — Completed 2026-04-03. 27 nodes renamed.
 - **Idea 2 (New Nodes)** — Completed 2026-04-04. 29 Orange-inspired nodes added (total: 81 nodes).
+- **Idea 3 (Smart Wizard)** — Completed 2026-04-04. 7-step guided pipeline builder + duplicate blank fix.

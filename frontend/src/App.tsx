@@ -9,6 +9,7 @@ import { KeyboardShortcutsPanel } from '@/components/ui/KeyboardShortcutsPanel'
 import { OnboardingTour } from '@/components/ui/OnboardingTour'
 import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
+import { SmartWizard } from '@/components/wizard/SmartWizard'
 import { checkHealth } from '@/lib/api'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -16,10 +17,11 @@ import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
 import { useExecutionStore } from '@/store/executionStore'
 import { useProjectStore } from '@/store/projectStore'
+import { useWizardStore } from '@/store/wizardStore'
 import type { PipelineJSON } from '@/lib/types'
 
 type BackendStatus = 'connecting' | 'online' | 'offline'
-type View = 'dashboard' | 'canvas'
+type View = 'dashboard' | 'canvas' | 'wizard'
 
 
 export function App() {
@@ -38,6 +40,7 @@ export function App() {
   const currentProject                = useProjectStore(s => s.currentProject)
   const saveProject                   = useProjectStore(s => s.saveProject)
   const closeProject                  = useProjectStore(s => s.closeProject)
+  const createProject                 = useProjectStore(s => s.createProject)
 
   // Keyboard shortcuts for undo/redo
   const undo             = usePipelineStore(s => s.undo)
@@ -116,8 +119,54 @@ export function App() {
   const handleGoHome = useCallback(() => {
     closeProject()
     usePipelineStore.getState().clearPipeline()
+    useWizardStore.getState().reset()
     setView('dashboard')
   }, [closeProject])
+
+  // Open Smart Wizard
+  const handleOpenWizard = useCallback(() => {
+    useWizardStore.getState().reset()
+    setView('wizard')
+  }, [])
+
+  // Smart Wizard completed → create project, load pipeline, auto-execute
+  const handleWizardComplete = useCallback(async (pipeline: PipelineJSON, projectName: string) => {
+    try {
+      // Create a project with blank template, then load the wizard pipeline
+      await createProject(projectName, 'Created by Smart Wizard', 'wizard', 'blank')
+      // Load the wizard-built pipeline onto canvas
+      loadPipelineFromJSON(pipeline, manifests)
+      setView('canvas')
+      // Save the wizard pipeline to the project
+      await saveProject(pipeline, 'Smart Wizard pipeline')
+      // Auto-execute the pipeline
+      setTimeout(() => {
+        executePipeline(pipeline)
+      }, 500)
+    } catch {
+      // If project creation fails (e.g. name conflict), still load onto canvas
+      loadPipelineFromJSON(pipeline, manifests)
+      setView('canvas')
+      setTimeout(() => {
+        executePipeline(pipeline)
+      }, 500)
+    }
+  }, [createProject, loadPipelineFromJSON, manifests, saveProject, executePipeline])
+
+  const handleWizardCancel = useCallback(() => {
+    useWizardStore.getState().reset()
+    setView('dashboard')
+  }, [])
+
+  // ── Wizard view ──
+  if (view === 'wizard') {
+    return (
+      <SmartWizard
+        onComplete={handleWizardComplete}
+        onCancel={handleWizardCancel}
+      />
+    )
+  }
 
   // ── Dashboard view ──
   if (view === 'dashboard') {
@@ -128,7 +177,7 @@ export function App() {
           nodesLoaded={nodesLoaded}
           onGoHome={handleGoHome}
         />
-        <ProjectDashboard onOpenProject={handleOpenProject} />
+        <ProjectDashboard onOpenProject={handleOpenProject} onOpenWizard={handleOpenWizard} />
       </div>
     )
   }

@@ -17,6 +17,11 @@ from core.settings import settings
 from services.git_service import GitService
 
 
+class DatasetPreviewRequest(BaseModel):
+    dataset: str = "iris"
+    file_path: str = ""
+
+
 class SaveProjectBody(BaseModel):
     project_path: str
     pipeline: dict
@@ -74,6 +79,51 @@ def _read_pipeline(project_path: Path) -> dict[str, Any]:
 def _write_pipeline(project_path: Path, pipeline: dict[str, Any]) -> None:
     pipeline_file = project_path / "pipeline.json"
     pipeline_file.write_text(json.dumps(pipeline, indent=2))
+
+
+# ── POST /dataset/preview — quick column info for Smart Wizard ───────────────
+
+@router.post("/dataset/preview")
+async def dataset_preview(body: DatasetPreviewRequest) -> JSONResponse:
+    """Load a sample dataset or uploaded CSV and return column metadata + preview rows."""
+    import pandas as pd
+
+    if body.file_path:
+        # Preview an uploaded CSV file
+        fp = Path(body.file_path)
+        if not fp.exists():
+            raise HTTPException(404, f"File not found: {body.file_path}")
+        try:
+            df = pd.read_csv(fp)
+        except Exception as exc:
+            raise HTTPException(400, f"Failed to read CSV: {exc}") from exc
+    else:
+        from node_packages.builtin.sample_dataset.executor import execute as load_dataset
+        try:
+            result = load_dataset({}, {"dataset": body.dataset}, {})
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        df = result["dataframe_out"]
+    columns = [
+        {
+            "name": col,
+            "dtype": str(df[col].dtype),
+            "missing": int(df[col].isnull().sum()),
+            "unique": int(df[col].nunique()),
+            "is_numeric": df[col].dtype.kind in ("i", "f"),
+        }
+        for col in df.columns
+    ]
+
+    # Send first 5 rows for preview
+    preview = df.head(5).fillna("").values.tolist()
+
+    return JSONResponse({
+        "columns": columns,
+        "column_names": list(df.columns),
+        "shape": list(df.shape),
+        "preview": preview,
+    })
 
 
 # ── GET /projects — list all projects ────────────────────────────────────────
