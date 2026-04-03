@@ -1,0 +1,40 @@
+[
+  {
+    "id": "columns",
+    "label": "Columns to Discretize",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "method",
+    "label": "Binning Method",
+    "type": "select",
+    "options": ["equal_width", "equal_frequency", "custom"],
+    "default": "equal_width",
+    "tier": "basic"
+  },
+  {
+    "id": "n_bins",
+    "label": "Number of Bins",
+    "type": "int",
+    "default": 5,
+    "min": 2,
+    "max": 50,
+    "tier": "basic"
+  },
+  {
+    "id": "custom_edges",
+    "label": "Custom Bin Edges",
+    "type": "str",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "labels",
+    "label": "Bin Labels",
+    "type": "str",
+    "default": "",
+    "tier": "advanced"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "id": "vrl.core.load_model",
+  "name": "Load Model",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.classification",
+  "description": "Load a previously saved model from a .joblib file.",
+  "inputs": [],
+  "outputs": [
+    { "id": "model_out", "type": "Model", "label": "Loaded Model" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

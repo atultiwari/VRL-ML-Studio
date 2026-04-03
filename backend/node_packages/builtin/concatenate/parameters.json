@@ -1,0 +1,24 @@
+[
+  {
+    "id": "axis",
+    "label": "Stack Direction",
+    "type": "select",
+    "options": ["rows", "columns"],
+    "default": "rows",
+    "tier": "basic"
+  },
+  {
+    "id": "ignore_index",
+    "label": "Reset Index",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  },
+  {
+    "id": "add_source_column",
+    "label": "Add Source Column",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

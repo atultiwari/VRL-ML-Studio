@@ -1,0 +1,20 @@
+{
+  "id": "vrl.core.predictions",
+  "name": "Predictions",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Generate a table of model predictions alongside actual values for inspection.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Predictions Table" },
+    { "id": "metrics_out", "type": "Metrics", "label": "Prediction Summary" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

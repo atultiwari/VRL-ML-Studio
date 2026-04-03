@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.merge_data",
+  "name": "Merge Data",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Join two DataFrames on one or more key columns using inner, left, right, or outer join.",
+  "inputs": [
+    { "id": "dataframe_left", "type": "DataFrame", "label": "Left Dataset" },
+    { "id": "dataframe_right", "type": "DataFrame", "label": "Right Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Merged Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

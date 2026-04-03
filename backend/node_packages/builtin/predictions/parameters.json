@@ -1,0 +1,16 @@
+[
+  {
+    "id": "target_col",
+    "label": "Target Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "include_probabilities",
+    "label": "Include Probabilities",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

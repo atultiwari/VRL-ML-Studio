@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.concatenate",
+  "name": "Concatenate",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "preprocessing",
+  "description": "Stack two DataFrames vertically (row-wise) or horizontally (column-wise).",
+  "inputs": [
+    { "id": "dataframe_top", "type": "DataFrame", "label": "First Dataset" },
+    { "id": "dataframe_bottom", "type": "DataFrame", "label": "Second Dataset" }
+  ],
+  "outputs": [
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Combined Dataset" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

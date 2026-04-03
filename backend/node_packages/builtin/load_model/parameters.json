@@ -1,0 +1,9 @@
+[
+  {
+    "id": "filepath",
+    "label": "Model File Path",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  }
+]

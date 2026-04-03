@@ -1,0 +1,27 @@
+[
+  {
+    "id": "n_estimators",
+    "label": "Number of Estimators",
+    "type": "int",
+    "default": 50,
+    "min": 1,
+    "max": 2000,
+    "tier": "basic"
+  },
+  {
+    "id": "learning_rate",
+    "label": "Learning Rate",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.001,
+    "max": 10.0,
+    "tier": "basic"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

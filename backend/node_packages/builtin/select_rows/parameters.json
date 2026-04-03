@@ -1,0 +1,24 @@
+[
+  {
+    "id": "column",
+    "label": "Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "operator",
+    "label": "Operator",
+    "type": "select",
+    "options": ["==", "!=", ">", "<", ">=", "<=", "is_null", "not_null", "contains", "in"],
+    "default": "==",
+    "tier": "basic"
+  },
+  {
+    "id": "value",
+    "label": "Value",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "filename",
+    "label": "Filename",
+    "type": "str",
+    "default": "model.joblib",
+    "tier": "basic"
+  }
+]

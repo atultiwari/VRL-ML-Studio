@@ -1,0 +1,26 @@
+[
+  {
+    "id": "target_col",
+    "label": "Target Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "method",
+    "label": "Ranking Method",
+    "type": "select",
+    "options": ["mutual_info", "anova_f", "chi2"],
+    "default": "mutual_info",
+    "tier": "basic"
+  },
+  {
+    "id": "top_n",
+    "label": "Top N Features",
+    "type": "int",
+    "default": 20,
+    "min": 1,
+    "max": 100,
+    "tier": "basic"
+  }
+]

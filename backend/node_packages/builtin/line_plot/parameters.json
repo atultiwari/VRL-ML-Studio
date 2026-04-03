@@ -1,0 +1,30 @@
+[
+  {
+    "id": "x_col",
+    "label": "X Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "y_cols",
+    "label": "Y Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "color_col",
+    "label": "Color Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "show_markers",
+    "label": "Show Markers",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

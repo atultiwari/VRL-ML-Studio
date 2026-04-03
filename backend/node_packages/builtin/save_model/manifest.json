@@ -1,0 +1,18 @@
+{
+  "id": "vrl.core.save_model",
+  "name": "Save Model",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.classification",
+  "description": "Save a trained model to disk as a .joblib file for later reuse.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" }
+  ],
+  "outputs": [
+    { "id": "metrics_out", "type": "Metrics", "label": "Save Info" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

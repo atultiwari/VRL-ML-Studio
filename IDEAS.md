@@ -51,34 +51,38 @@
 
 ---
 
-## Future Node Additions (inspired by Orange)
+## Idea 2 — New Nodes (inspired by Orange)
 
-**Status:** `proposed`
+**Status:** `done` (13 nodes) / remaining `proposed`
 
 Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value for tabular data analysis.
 
-### High Priority
+### Implemented (13 new nodes)
+
+| Node ID | Name | Category | Description |
+|---|---|---|---|
+| `vrl.core.select_rows` | Select Rows | preprocessing | Filter rows by conditions (==, !=, >, <, contains, is_null, etc.) |
+| `vrl.core.merge_data` | Merge Data | preprocessing | Join two DataFrames (inner, left, right, outer) |
+| `vrl.core.concatenate` | Concatenate | preprocessing | Stack DataFrames vertically or horizontally |
+| `vrl.core.discretize` | Discretize | preprocessing | Bin continuous columns (equal-width, equal-freq, custom) |
+| `vrl.core.adaboost_classifier` | AdaBoost | model.classification | Adaptive Boosting classifier |
+| `vrl.core.adaboost_regressor` | AdaBoost (Regressor) | model.regression | Adaptive Boosting regressor |
+| `vrl.core.rank` | Rank | data.eda | Feature ranking (mutual info, ANOVA F, chi-squared) |
+| `vrl.core.predictions` | Predictions | evaluation.classification | Predictions table with actual vs predicted |
+| `vrl.core.save_model` | Save Model | model.classification | Save model as .joblib |
+| `vrl.core.load_model` | Load Model | model.classification | Load model from .joblib |
+| `vrl.core.violin_plot` | Violin Plot | data.eda | Violin plot with optional grouping |
+| `vrl.core.bar_plot` | Bar Plot | data.eda | Bar chart with count/mean/sum/median aggregation |
+| `vrl.core.line_plot` | Line Plot | data.eda | Line chart for trends and time series |
+
+### Still Proposed
+
+#### Medium Priority
 
 | Widget | Category | Description |
 |---|---|---|
-| Select Rows | Transform | Filter rows by conditions (e.g., Age > 30, column == "value") |
-| Merge Data | Transform | Join two DataFrames on key columns (inner, left, right, outer) |
-| Concatenate | Transform | Stack two DataFrames vertically |
-| AdaBoost | Model | Popular boosting ensemble (sklearn AdaBoostClassifier/Regressor) |
-| Save Model / Load Model | Model | Persist trained models to disk as .pkl or .joblib |
-| Predictions | Evaluate | Dedicated table viewer for model predictions + actuals |
-| Rank | Data | Feature ranking by mutual info, ANOVA, chi-squared scores |
-
-### Medium Priority
-
-| Widget | Category | Description |
-|---|---|---|
-| Discretize | Transform | Bin continuous columns into categorical (equal-width, equal-freq, entropy) |
 | Create Class | Transform | Designate/change the target variable column |
 | Data Table | Data | Dedicated interactive data viewer (separate from Data Info) |
-| Violin Plot | Visualize | Distribution visualization richer than box plot |
-| Bar Plot | Visualize | Categorical frequency / aggregation bar chart |
-| Line Plot | Visualize | Time series / trend line visualization |
 | Heat Map | Visualize | General-purpose heatmap (beyond correlation) |
 | Neural Network (MLP) | Model | sklearn MLPClassifier/MLPRegressor for tabular data |
 | Stacking | Model | Ensemble meta-learner combining multiple base models |
@@ -104,3 +108,4 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 _Completed ideas move here with implementation notes._
 
 - **Idea 1 (Orange Naming)** — Completed 2026-04-03. 27 nodes renamed.
+- **Idea 2 (New Nodes)** — Completed 2026-04-03. 13 Orange-inspired nodes added (total: 65 nodes).

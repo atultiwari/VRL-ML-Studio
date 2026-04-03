@@ -1,0 +1,30 @@
+[
+  {
+    "id": "columns",
+    "label": "Columns",
+    "type": "multicolumn_select",
+    "default": [],
+    "tier": "basic"
+  },
+  {
+    "id": "group_by",
+    "label": "Group By",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "show_box",
+    "label": "Show Box Plot Inside",
+    "type": "bool",
+    "default": true,
+    "tier": "basic"
+  },
+  {
+    "id": "show_points",
+    "label": "Show Data Points",
+    "type": "bool",
+    "default": false,
+    "tier": "advanced"
+  }
+]

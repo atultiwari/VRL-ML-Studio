@@ -1,0 +1,31 @@
+[
+  {
+    "id": "on_columns",
+    "label": "Key Columns",
+    "type": "str",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "how",
+    "label": "Join Type",
+    "type": "select",
+    "options": ["inner", "left", "right", "outer"],
+    "default": "inner",
+    "tier": "basic"
+  },
+  {
+    "id": "suffixes_left",
+    "label": "Left Suffix",
+    "type": "str",
+    "default": "_left",
+    "tier": "advanced"
+  },
+  {
+    "id": "suffixes_right",
+    "label": "Right Suffix",
+    "type": "str",
+    "default": "_right",
+    "tier": "advanced"
+  }
+]

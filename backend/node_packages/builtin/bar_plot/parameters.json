@@ -1,0 +1,39 @@
+[
+  {
+    "id": "x_col",
+    "label": "X Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "basic"
+  },
+  {
+    "id": "y_col",
+    "label": "Y Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "aggregation",
+    "label": "Aggregation",
+    "type": "select",
+    "options": ["count", "mean", "sum", "median"],
+    "default": "count",
+    "tier": "basic"
+  },
+  {
+    "id": "color_col",
+    "label": "Color Column",
+    "type": "column_select",
+    "default": "",
+    "tier": "advanced"
+  },
+  {
+    "id": "orientation",
+    "label": "Orientation",
+    "type": "select",
+    "options": ["vertical", "horizontal"],
+    "default": "vertical",
+    "tier": "advanced"
+  }
+]
