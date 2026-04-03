@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.random_forest_classifier",
+  "name": "Random Forest Classifier",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "model.classification",
+  "description": "Ensemble of decision trees for classification tasks.",
+  "inputs": [
+    { "id": "split_data_in", "type": "SplitData", "label": "Train/Test Data" }
+  ],
+  "outputs": [
+    { "id": "model_out", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_out", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

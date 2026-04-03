@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.confusion_matrix",
+  "name": "Confusion Matrix",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Visualize the confusion matrix as an interactive heatmap for a trained classification model.",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Confusion Matrix" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

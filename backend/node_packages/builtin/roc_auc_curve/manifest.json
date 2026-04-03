@@ -1,0 +1,20 @@
+{
+  "id": "vrl.core.roc_auc_curve",
+  "name": "ROC-AUC Curve",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Plot the Receiver Operating Characteristic curve and compute the AUC score. Supports binary and multiclass (One-vs-Rest).",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "ROC Curve" },
+    { "id": "metrics_out", "type": "Metrics", "label": "AUC Score" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

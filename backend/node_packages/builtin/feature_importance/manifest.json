@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.feature_importance",
+  "name": "Feature Importance",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Display feature importance scores as a horizontal bar chart. Requires a tree-based model (Random Forest, Decision Tree, XGBoost, Gradient Boosting).",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Feature Importance" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

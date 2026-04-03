@@ -1,0 +1,9 @@
+[
+  {
+    "id": "target_col",
+    "label": "Target Column",
+    "type": "column_select",
+    "default": null,
+    "tier": "basic"
+  }
+]

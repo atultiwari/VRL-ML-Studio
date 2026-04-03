@@ -1,0 +1,43 @@
+[
+  {
+    "id": "C",
+    "label": "Regularization (C)",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.001,
+    "max": 1000,
+    "tier": "basic"
+  },
+  {
+    "id": "solver",
+    "label": "Solver",
+    "type": "select",
+    "options": ["lbfgs", "liblinear", "newton-cg", "sag", "saga"],
+    "default": "lbfgs",
+    "tier": "basic"
+  },
+  {
+    "id": "max_iter",
+    "label": "Max Iterations",
+    "type": "int",
+    "default": 100,
+    "min": 10,
+    "max": 10000,
+    "tier": "basic"
+  },
+  {
+    "id": "multi_class",
+    "label": "Multi-Class Strategy",
+    "type": "select",
+    "options": ["auto", "ovr", "multinomial"],
+    "default": "auto",
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

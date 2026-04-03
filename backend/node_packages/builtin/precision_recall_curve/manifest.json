@@ -1,0 +1,19 @@
+{
+  "id": "vrl.core.precision_recall_curve",
+  "name": "Precision-Recall Curve",
+  "version": "1.0.0",
+  "author": "VRL ML Studio",
+  "category": "evaluation.classification",
+  "description": "Plot the Precision-Recall curve for a trained classification model. Supports binary and multiclass (One-vs-Rest).",
+  "inputs": [
+    { "id": "model_in", "type": "Model", "label": "Trained Model" },
+    { "id": "dataframe_in", "type": "DataFrame", "label": "Test Data" }
+  ],
+  "outputs": [
+    { "id": "plot_out", "type": "Plot", "label": "Precision-Recall Curve" }
+  ],
+  "executor": "executor.py",
+  "parameters": "parameters.json",
+  "ui": "ui.json",
+  "min_studio_version": "1.0.0"
+}

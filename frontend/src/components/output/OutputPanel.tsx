@@ -84,15 +84,33 @@ export function OutputPanel() {
         )}
 
         {output?.type === 'metrics' && (
-          <div className="flex flex-wrap gap-3 p-3">
-            {Object.entries(output.data).map(([k, v]) => (
-              <div key={k} className="flex flex-col rounded-lg border border-border bg-muted/30 px-3 py-2 min-w-[100px]">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{k}</span>
-                <span className="mt-0.5 text-sm font-medium text-foreground">
-                  {typeof v === 'number' ? v.toFixed(4) : String(v)}
-                </span>
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-3 p-3 overflow-y-auto">
+            {Object.entries(output.data).map(([k, v]) => {
+              const quality = getMetricQuality(k, v)
+              return (
+                <div
+                  key={k}
+                  className={cn(
+                    'flex flex-col rounded-lg border px-3 py-2 min-w-[110px]',
+                    quality === 'good'    && 'border-emerald-500/30 bg-emerald-500/10',
+                    quality === 'fair'    && 'border-amber-500/30 bg-amber-500/10',
+                    quality === 'poor'    && 'border-red-500/30 bg-red-500/10',
+                    quality === 'neutral' && 'border-border bg-muted/30',
+                  )}
+                >
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{k}</span>
+                  <span className={cn(
+                    'mt-0.5 text-sm font-semibold',
+                    quality === 'good'    && 'text-emerald-400',
+                    quality === 'fair'    && 'text-amber-400',
+                    quality === 'poor'    && 'text-red-400',
+                    quality === 'neutral' && 'text-foreground',
+                  )}>
+                    {typeof v === 'number' ? v.toFixed(4) : String(v)}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -108,6 +126,40 @@ export function OutputPanel() {
       </div>
     </div>
   )
+}
+
+// ── Metric quality classification ────────────────────────────────────────────
+
+type MetricQuality = 'good' | 'fair' | 'poor' | 'neutral'
+
+/** Classify a metric value as good/fair/poor based on common ML metric ranges. */
+function getMetricQuality(key: string, value: unknown): MetricQuality {
+  if (typeof value !== 'number') return 'neutral'
+  const k = key.toLowerCase()
+
+  // Higher-is-better metrics (0–1 scale): accuracy, precision, recall, f1, auc, r2
+  const higherBetter = ['accuracy', 'precision', 'recall', 'f1', 'auc', 'r2', 'r_squared', 'adj_r2']
+  if (higherBetter.some(m => k.includes(m))) {
+    if (value >= 0.8) return 'good'
+    if (value >= 0.6) return 'fair'
+    return 'poor'
+  }
+
+  // Lower-is-better error metrics: mae, mse, rmse, log_loss
+  const lowerBetter = ['mae', 'mse', 'rmse', 'error', 'loss']
+  if (lowerBetter.some(m => k.includes(m))) {
+    // These are scale-dependent, so just show neutral unless extremely large
+    return 'neutral'
+  }
+
+  // Silhouette score (-1 to 1, higher is better)
+  if (k.includes('silhouette')) {
+    if (value >= 0.5) return 'good'
+    if (value >= 0.25) return 'fair'
+    return 'poor'
+  }
+
+  return 'neutral'
 }
 
 // ── SplitData viewer (train/test tabs) ──────────────────────────────────────

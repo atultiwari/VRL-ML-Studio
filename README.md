@@ -132,24 +132,24 @@ This project is built in 12 stages. Each stage is gate-approved before the next 
 | 3 | Parameter Panel (dynamic form from parameters.json) | ✅ Complete |
 | 4 | Data Input & EDA Nodes | ✅ Complete |
 | 5 | Preprocessing Nodes | ✅ Complete |
-| 6 | Classification Models & Evaluation | 🔄 Next |
-| 7 | Regression Models & Evaluation | Pending |
+| 6 | Classification Models & Evaluation | ✅ Complete |
+| 7 | Regression Models & Evaluation | 🔄 Next |
 | 8 | Unsupervised Models & Evaluation | Pending |
 | 9 | Git-Based Project Management | Pending |
 | 10 | Code Export (Python + Jupyter) | Pending |
 | 11 | Node Package Import/Export UI | Pending |
 | 12 | Polish, Testing & Documentation | Pending |
 
-### Stage 5 — What's working now
+### Stage 6 — What's working now
 
 All previous stages plus:
 
-- **9 preprocessing nodes**: Missing Value Imputer, Encoder, Feature Scaler, Feature Selector, Train-Test Splitter, Outlier Handler, Column Dropper, Type Caster, Duplicate Remover
-- **Full preprocessing chain** executes end-to-end: CSV → Imputer → Encoder → Scaler → Feature Selector → Train-Test Splitter
-- **Column select controls** populated from upstream DataFrame columns after execution
-- **SplitData preview** shows train/test splits with row counts and target column indicator
-- **Cache-aware execution**: re-running unchanged nodes uses cached output; parameter changes invalidate downstream cache
-- **62 backend tests** passing (34 new preprocessing tests)
+- **8 classification model nodes**: Logistic Regression, Decision Tree, Random Forest, XGBoost, SVM, KNN, Naive Bayes, Gradient Boosting
+- **5 evaluation nodes**: Classification Report, Confusion Matrix, ROC-AUC Curve, Precision-Recall Curve, Feature Importance
+- **Full classification pipeline**: Load CSV → Preprocess → Train → Evaluate (metrics + charts)
+- **Color-coded metrics cards**: green (good), amber (fair), red (poor) based on metric type and value
+- **Interactive Plotly charts** for confusion matrix, ROC curves, precision-recall curves, feature importance
+- **77 backend tests** passing (15 new classification/evaluation tests)
 
 ---
 

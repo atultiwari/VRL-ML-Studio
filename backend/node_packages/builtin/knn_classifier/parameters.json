@@ -1,0 +1,27 @@
+[
+  {
+    "id": "n_neighbors",
+    "label": "Number of Neighbors (K)",
+    "type": "int",
+    "default": 5,
+    "min": 1,
+    "max": 100,
+    "tier": "basic"
+  },
+  {
+    "id": "weights",
+    "label": "Weight Function",
+    "type": "select",
+    "options": ["uniform", "distance"],
+    "default": "uniform",
+    "tier": "basic"
+  },
+  {
+    "id": "metric",
+    "label": "Distance Metric",
+    "type": "select",
+    "options": ["euclidean", "manhattan", "minkowski"],
+    "default": "euclidean",
+    "tier": "advanced"
+  }
+]

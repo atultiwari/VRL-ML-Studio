@@ -1,0 +1,36 @@
+[
+  {
+    "id": "C",
+    "label": "Regularization (C)",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.001,
+    "max": 1000,
+    "tier": "basic"
+  },
+  {
+    "id": "kernel",
+    "label": "Kernel",
+    "type": "select",
+    "options": ["rbf", "linear", "poly", "sigmoid"],
+    "default": "rbf",
+    "tier": "basic"
+  },
+  {
+    "id": "gamma",
+    "label": "Gamma",
+    "type": "select",
+    "options": ["scale", "auto"],
+    "default": "scale",
+    "tier": "basic"
+  },
+  {
+    "id": "degree",
+    "label": "Polynomial Degree",
+    "type": "int",
+    "default": 3,
+    "min": 1,
+    "max": 10,
+    "tier": "advanced"
+  }
+]

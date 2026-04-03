@@ -1,0 +1,45 @@
+[
+  {
+    "id": "n_estimators",
+    "label": "Number of Trees",
+    "type": "int",
+    "default": 100,
+    "min": 1,
+    "max": 2000,
+    "tier": "basic"
+  },
+  {
+    "id": "learning_rate",
+    "label": "Learning Rate",
+    "type": "float",
+    "default": 0.1,
+    "min": 0.001,
+    "max": 1.0,
+    "tier": "basic"
+  },
+  {
+    "id": "max_depth",
+    "label": "Max Depth",
+    "type": "int",
+    "default": 6,
+    "min": 1,
+    "max": 20,
+    "tier": "basic"
+  },
+  {
+    "id": "subsample",
+    "label": "Subsample Ratio",
+    "type": "float",
+    "default": 1.0,
+    "min": 0.1,
+    "max": 1.0,
+    "tier": "advanced"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]

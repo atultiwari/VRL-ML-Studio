@@ -1,0 +1,35 @@
+[
+  {
+    "id": "max_depth",
+    "label": "Max Depth",
+    "type": "int_or_null",
+    "default": null,
+    "min": 1,
+    "max": 50,
+    "tier": "basic"
+  },
+  {
+    "id": "min_samples_split",
+    "label": "Min Samples Split",
+    "type": "int",
+    "default": 2,
+    "min": 2,
+    "max": 100,
+    "tier": "basic"
+  },
+  {
+    "id": "criterion",
+    "label": "Criterion",
+    "type": "select",
+    "options": ["gini", "entropy", "log_loss"],
+    "default": "gini",
+    "tier": "basic"
+  },
+  {
+    "id": "random_state",
+    "label": "Random State",
+    "type": "int",
+    "default": 42,
+    "tier": "advanced"
+  }
+]
