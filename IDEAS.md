@@ -182,6 +182,33 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 
 ---
 
+## Idea 5 — Smart Wizard Export (Python Script + Colab Notebook)
+
+**Status:** `done`
+
+**Origin:** After building a pipeline through the Smart Wizard, users want to export the generated pipeline as a `.py` script or a Google Colab-compatible `.ipynb` notebook — without first loading it onto the canvas.
+
+**Analysis:**
+- The backend already has `POST /export/python` and `POST /export/notebook` endpoints via `ExportService`
+- The frontend already has `exportPython()` and `exportNotebook()` API client functions
+- The wizard's `buildPipeline()` already produces a complete `PipelineJSON`
+- **This was a frontend-only change** — no new backend code required
+
+**What was done:**
+- Added two export buttons to the wizard's final step (Step 7: "Review & Build"):
+  - "Export .py" — calls `exportPython()` with the wizard-generated pipeline, triggers browser download
+  - "Export .ipynb" — calls `exportNotebook()` with the wizard-generated pipeline, triggers browser download
+- Three clear exit paths in the footer: Export .py | Export .ipynb | Build Pipeline
+- Loading state with spinner during export (disabled state prevents double-clicks)
+- Error handling with inline error message in the review step
+- Pipeline name derived from dataset name (reused from `handleBuild` via shared `getPipelineName()`)
+- Updated StepBuild description to explain all three actions
+
+**Files changed:**
+- `frontend/src/components/wizard/SmartWizard.tsx` — added export imports, `handleExport()`, `getPipelineName()`, export buttons in footer, error display in StepBuild
+
+---
+
 ## Archive
 
 _Completed ideas move here with implementation notes._
@@ -190,3 +217,4 @@ _Completed ideas move here with implementation notes._
 - **Idea 2 (New Nodes)** — Completed 2026-04-04. 29 Orange-inspired nodes added (total: 81 nodes).
 - **Idea 3 (Smart Wizard)** — Completed 2026-04-04. 7-step guided pipeline builder + duplicate blank fix.
 - **Idea 4 (Canvas Quick Node Picker)** — Completed 2026-04-04. Right-click picker + connection-drop auto-complete.
+- **Idea 5 (Wizard Export)** — Completed 2026-04-04. Export .py and .ipynb directly from Smart Wizard (frontend-only).

@@ -13,10 +13,12 @@ import {
   Upload,
   FileSpreadsheet,
   Loader2,
+  FileCode,
+  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWizardStore, type TaskType } from '@/store/wizardStore'
-import { datasetPreview, uploadFile } from '@/lib/api'
+import { datasetPreview, uploadFile, exportPython, exportNotebook } from '@/lib/api'
 import type { PipelineJSON, PipelineNodeJSON, PipelineEdgeJSON } from '@/lib/types'
 
 // ── Algorithm definitions ────────────────────────────────────────────────────
@@ -137,14 +139,47 @@ export function SmartWizard({ onComplete, onCancel }: Props) {
     loadPreview('', filePath)
   }, [loadPreview]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleBuild = useCallback(() => {
-    const pipeline = buildPipeline(store)
+  const getPipelineName = useCallback((): string => {
     const dsInfo = SAMPLE_DATASETS.find(d => d.id === store.sampleDataset)
-    const projectName = store.datasetSource === 'upload'
+    return store.datasetSource === 'upload'
       ? `${store.uploadedFileName.replace(/\.csv$/i, '')} Pipeline`
       : `${dsInfo?.name ?? 'ML'} Pipeline`
-    onComplete(pipeline, projectName)
-  }, [store, onComplete])
+  }, [store])
+
+  const handleBuild = useCallback(() => {
+    const pipeline = buildPipeline(store)
+    onComplete(pipeline, getPipelineName())
+  }, [store, onComplete, getPipelineName])
+
+  const [exporting, setExporting] = useState<'python' | 'notebook' | null>(null)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const handleExport = useCallback(async (format: 'python' | 'notebook') => {
+    setExporting(format)
+    setExportError(null)
+    try {
+      const pipeline = buildPipeline(store)
+      const name = getPipelineName()
+      const blob = format === 'python'
+        ? await exportPython(pipeline, name)
+        : await exportNotebook(pipeline, name)
+
+      const ext = format === 'python' ? '.py' : '.ipynb'
+      const filename = name.replace(/\s+/g, '_').toLowerCase() + ext
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Export failed')
+    } finally {
+      setExporting(null)
+    }
+  }, [store, getPipelineName])
 
   const canProceed = useCallback((): boolean => {
     switch (store.step) {
@@ -206,7 +241,7 @@ export function SmartWizard({ onComplete, onCancel }: Props) {
           {store.step === 3 && <StepPreprocessing />}
           {store.step === 4 && <StepSplit />}
           {store.step === 5 && <StepAlgorithm />}
-          {store.step === 6 && <StepBuild />}
+          {store.step === 6 && <StepBuild exportError={exportError} />}
         </div>
       </div>
 
@@ -239,12 +274,41 @@ export function SmartWizard({ onComplete, onCancel }: Props) {
             Next <ArrowRight className="h-3.5 w-3.5" />
           </button>
         ) : (
-          <button
-            onClick={handleBuild}
-            className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-500 transition-colors"
-          >
-            <Play className="h-3.5 w-3.5" /> Build Pipeline
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleExport('python')}
+              disabled={!!exporting}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs font-medium transition-colors',
+                exporting === 'python'
+                  ? 'opacity-60 cursor-wait'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+            >
+              {exporting === 'python' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileCode className="h-3.5 w-3.5" />}
+              Export .py
+            </button>
+            <button
+              onClick={() => handleExport('notebook')}
+              disabled={!!exporting}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs font-medium transition-colors',
+                exporting === 'notebook'
+                  ? 'opacity-60 cursor-wait'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+            >
+              {exporting === 'notebook' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BookOpen className="h-3.5 w-3.5" />}
+              Export .ipynb
+            </button>
+            <button
+              onClick={handleBuild}
+              disabled={!!exporting}
+              className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-500 transition-colors"
+            >
+              <Play className="h-3.5 w-3.5" /> Build Pipeline
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -853,7 +917,7 @@ function StepAlgorithm() {
 
 // ── Step 7: Build & Review ───────────────────────────────────────────────────
 
-function StepBuild() {
+function StepBuild({ exportError }: { exportError: string | null }) {
   const store = useWizardStore()
   const algos = store.taskType === 'classification' ? CLASSIFICATION_ALGOS : REGRESSION_ALGOS
 
@@ -862,7 +926,7 @@ function StepBuild() {
       <div>
         <h2 className="text-lg font-semibold text-foreground">Review & Build</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Review your choices, then build and execute the pipeline.
+          Review your choices, then build the pipeline or export it directly.
         </p>
       </div>
 
@@ -890,10 +954,19 @@ function StepBuild() {
 
       <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
         <p className="text-xs text-primary">
-          Clicking "Build Pipeline" will create a project, load the pipeline onto the canvas,
-          and auto-execute it so you can see results immediately.
+          <strong>Build Pipeline</strong> creates a project and auto-executes on canvas.
+        </p>
+        <p className="mt-1.5 text-xs text-primary/80">
+          <strong>Export .py</strong> downloads a standalone Python script.{' '}
+          <strong>Export .ipynb</strong> downloads a Google Colab-compatible Jupyter notebook.
         </p>
       </div>
+
+      {exportError && (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3">
+          <p className="text-xs text-red-400">{exportError}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -960,28 +1033,37 @@ function buildPipeline(state: ReturnType<typeof useWizardStore.getState>): Pipel
     correlation_target: null,
   })
 
-  // 3. Impute missing values
+  // Derive feature column lists by type (excluding target column)
+  const numericFeatures = state.columns
+    .filter(c => state.featureColumns.includes(c.name) && c.is_numeric)
+    .map(c => c.name)
+  const categoricalFeatures = state.columns
+    .filter(c => state.featureColumns.includes(c.name) && !c.is_numeric)
+    .map(c => c.name)
+
+  // 3. Impute missing values (feature columns only — target must stay untouched)
   addNode('vrl.core.missing_value_imputer', 'Impute', {
     strategy: state.imputeStrategy,
     fill_value: '',
-    columns: [],
+    columns: state.featureColumns,
   })
 
-  // 4. Encode categoricals
-  const hasCategorical = state.columns.some(c => state.featureColumns.includes(c.name) && !c.is_numeric)
-  if (hasCategorical) {
+  // 4. Encode categoricals (feature columns only)
+  if (categoricalFeatures.length > 0) {
     addNode('vrl.core.encoder', 'Continuize', {
       method: state.encodingMethod,
-      columns: [],
+      columns: categoricalFeatures,
       drop_first: true,
     })
   }
 
-  // 5. Scale features
-  addNode('vrl.core.feature_scaler', 'Preprocess', {
-    method: state.scalingMethod,
-    columns: [],
-  })
+  // 5. Scale features (numeric feature columns only — never the target)
+  if (numericFeatures.length > 0) {
+    addNode('vrl.core.feature_scaler', 'Preprocess', {
+      method: state.scalingMethod,
+      columns: numericFeatures,
+    })
+  }
 
   // 6. Train/Test Split
   const splitterId = addNode('vrl.core.train_test_splitter', 'Data Sampler', {
