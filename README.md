@@ -22,13 +22,16 @@ Inspired by Orange Data Mining — designed for the browser with Git versioning 
 
 ## Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - Node.js 18+
 - pip / npm
+- Docker & Docker Compose (optional — for containerised setup)
 
 ---
 
 ## Quick Start
+
+### Option 1: Local (no Docker)
 
 ```bash
 # Install all dependencies (first time only)
@@ -39,6 +42,31 @@ make dev
 ```
 
 Then open http://localhost:3000
+
+### Option 2: Docker
+
+```bash
+# Build and start both services
+docker compose up --build
+
+# Or run in the background
+docker compose up --build -d
+```
+
+Frontend: http://localhost:3000 | Backend: http://localhost:8000
+
+```bash
+# Stop the containers
+docker compose down
+
+# Stop and remove volumes (clears project data)
+docker compose down -v
+```
+
+**Notes:**
+- Source code is bind-mounted — changes to `frontend/` and `backend/` are reflected immediately (hot reload is on).
+- Project data is stored in a Docker volume (`vrl_projects`). It persists across restarts but is removed with `docker compose down -v`.
+- The frontend container waits for the backend health check to pass before starting.
 
 ---
 
@@ -165,7 +193,7 @@ vrl-ml-studio/
 │       ├── hooks/             # useNodeRegistry, useWebSocket
 │       ├── store/             # Zustand stores (pipeline, execution, project, ui)
 │       └── lib/               # API client, types, utilities
-├── backend/                   # FastAPI + Python 3.10+ (port 8000)
+├── backend/                   # FastAPI + Python 3.11+ (port 8000)
 │   ├── main.py
 │   ├── routers/               # execute, nodes, project, export, upload
 │   ├── services/              # dag_executor, node_registry, cache, git_service, export_service
@@ -233,7 +261,7 @@ make test-fe    # Frontend only
 | Layer | Technologies |
 |---|---|
 | Frontend | React 18, TypeScript, Vite, React Flow, Zustand, Tailwind CSS, shadcn/ui, react-plotly.js |
-| Backend | FastAPI, Python 3.10+, scikit-learn, XGBoost, pandas, plotly, GitPython, pydantic v2 |
+| Backend | FastAPI, Python 3.11+, scikit-learn, XGBoost, pandas, plotly, GitPython, pydantic v2 |
 | Testing | pytest, Vitest, React Testing Library |
 
 ---
