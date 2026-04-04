@@ -266,6 +266,18 @@ make test-fe    # Frontend only
 
 ---
 
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0). See [LICENSE](LICENSE) for the full text.
+
+### Commercial Licensing
+
+If you wish to use this project in a commercial setting without complying with the AGPL (e.g., keeping your source code private), a separate commercial license is available.
+
+Please contact: **atultiwari.in@gmail.com**
+
+---
+
 ## Developer
 
 **Dr. Atul Tiwari**
