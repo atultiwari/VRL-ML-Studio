@@ -12,9 +12,10 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import { NodeCard } from './NodeCard'
 import { NodeContextMenu } from './NodeContextMenu'
+import { NodePickerPopup } from './NodePickerPopup'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
-import type { NodeManifestWithUI } from '@/lib/types'
+import type { NodeManifestWithUI, PortType } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 // Custom node type registry — must be stable (defined outside component)
@@ -33,9 +34,27 @@ interface ContextMenuState {
   nodeType: string
 }
 
+interface NodePickerState {
+  /** Screen position */
+  x: number
+  y: number
+  /** Flow-space position for node placement */
+  flowX: number
+  flowY: number
+  /** If opened from a connection drop, the source info for auto-connect */
+  pendingConnection?: {
+    sourceNodeId: string
+    sourceHandleId: string
+    portType: PortType
+  }
+}
+
 export function Canvas({ manifests }: CanvasProps) {
   const rfInstanceRef = useRef<ReactFlowInstance | null>(null)
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
+  const [nodePicker, setNodePicker] = useState<NodePickerState | null>(null)
+  // Track the pending connection source while dragging
+  const pendingConnRef = useRef<{ nodeId: string; handleId: string } | null>(null)
 
   const nodes         = usePipelineStore(s => s.nodes)
   const edges         = usePipelineStore(s => s.edges)
@@ -89,6 +108,112 @@ export function Canvas({ manifests }: CanvasProps) {
     pushSnapshot()
   }, [pushSnapshot])
 
+  // ── Connection-drop: track pending connection ────────────────────────────
+
+  const onConnectStart = useCallback(
+    (_event: React.MouseEvent | React.TouchEvent, params: { nodeId: string | null; handleId: string | null; handleType: string | null }) => {
+      if (params.nodeId && params.handleId && params.handleType === 'source') {
+        pendingConnRef.current = { nodeId: params.nodeId, handleId: params.handleId }
+      }
+    },
+    []
+  )
+
+  const onConnectEnd = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      const pending = pendingConnRef.current
+      pendingConnRef.current = null
+      if (!pending || !rfInstanceRef.current) return
+
+      // Check if the drop landed on a valid target (a handle element)
+      const target = event.target as HTMLElement
+      if (target.closest('.react-flow__handle')) return
+
+      // Find the source port type
+      const { nodes: storeNodes } = usePipelineStore.getState()
+      const srcNode = storeNodes.find(n => n.id === pending.nodeId)
+      const srcPort = srcNode?.data.manifest.outputs.find(p => p.id === pending.handleId)
+      if (!srcPort) return
+
+      const clientX = 'clientX' in event ? event.clientX : event.changedTouches[0].clientX
+      const clientY = 'clientY' in event ? event.clientY : event.changedTouches[0].clientY
+      const flowPos = rfInstanceRef.current.screenToFlowPosition({ x: clientX, y: clientY })
+
+      setNodePicker({
+        x: clientX,
+        y: clientY,
+        flowX: flowPos.x,
+        flowY: flowPos.y,
+        pendingConnection: {
+          sourceNodeId: pending.nodeId,
+          sourceHandleId: pending.handleId,
+          portType: srcPort.type,
+        },
+      })
+    },
+    []
+  )
+
+  // ── Right-click on empty canvas ──────────────────────────────────────────
+
+  const onPaneContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault()
+      if (!rfInstanceRef.current) return
+      const flowPos = rfInstanceRef.current.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+      setNodePicker({
+        x: event.clientX,
+        y: event.clientY,
+        flowX: flowPos.x,
+        flowY: flowPos.y,
+      })
+    },
+    []
+  )
+
+  // ── Node picker select handler ───────────────────────────────────────────
+
+  const onNodePickerSelect = useCallback(
+    (manifest: NodeManifestWithUI) => {
+      if (!nodePicker) return
+      const position = { x: nodePicker.flowX, y: nodePicker.flowY }
+      addNode(manifest, position)
+
+      // If opened from a connection drop, auto-connect
+      if (nodePicker.pendingConnection) {
+        const { sourceNodeId, sourceHandleId, portType } = nodePicker.pendingConnection
+        // Find the first compatible input port on the new node
+        const targetPort = manifest.inputs.find(p => p.type === portType)
+        if (targetPort) {
+          // The new node ID follows the pattern in addNode: `${manifest.id}-${Date.now()}`
+          // We need to read the most recent node from the store after addNode
+          requestAnimationFrame(() => {
+            const { nodes: latestNodes } = usePipelineStore.getState()
+            const newNode = latestNodes[latestNodes.length - 1]
+            if (newNode) {
+              onConnect({
+                source: sourceNodeId,
+                sourceHandle: sourceHandleId,
+                target: newNode.id,
+                targetHandle: targetPort.id,
+              })
+            }
+          })
+        }
+      }
+
+      setNodePicker(null)
+    },
+    [nodePicker, addNode, onConnect]
+  )
+
+  const closeNodePicker = useCallback(() => {
+    setNodePicker(null)
+  }, [])
+
   const openOutputPanel = useCallback((nodeId: string) => {
     // Dynamically import to avoid circular store dependency
     import('@/store/executionStore').then(({ useExecutionStore }) => {
@@ -129,6 +254,7 @@ export function Canvas({ manifests }: CanvasProps) {
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null)
     setContextMenu(null)
+    setNodePicker(null)
   }, [setSelectedNodeId])
 
   return (
@@ -148,6 +274,9 @@ export function Canvas({ manifests }: CanvasProps) {
         onNodeDoubleClick={onNodeDoubleClick}
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
+        onConnectStart={onConnectStart}
+        onConnectEnd={onConnectEnd}
+        onPaneContextMenu={onPaneContextMenu}
         onInit={instance => { rfInstanceRef.current = instance }}
         nodeTypes={NODE_TYPES}
         isValidConnection={isValidConnection}
@@ -192,6 +321,17 @@ export function Canvas({ manifests }: CanvasProps) {
           nodeType={contextMenu.nodeType}
           onClose={closeContextMenu}
           onDelete={deleteNode}
+        />
+      )}
+
+      {nodePicker && (
+        <NodePickerPopup
+          x={nodePicker.x}
+          y={nodePicker.y}
+          manifests={manifests}
+          filterPortType={nodePicker.pendingConnection?.portType ?? null}
+          onSelect={onNodePickerSelect}
+          onClose={closeNodePicker}
         />
       )}
 

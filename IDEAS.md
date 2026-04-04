@@ -143,6 +143,45 @@ Widgets from Orange Data Mining not yet in VRL ML Studio, prioritized by value f
 
 ---
 
+## Idea 4 — Canvas Quick Node Picker (Right-Click + Connection Drop)
+
+**Status:** `done`
+
+**Origin:** Two related UX improvements to speed up pipeline building without the sidebar:
+
+### Feature A — Right-Click Canvas Context Menu
+**Problem:** Adding nodes requires the sidebar. Users want a faster way to place nodes directly where they're working on the canvas.
+
+**Solution:** Right-click on empty canvas area opens an inline node picker popup at the cursor position:
+- Quick-filter text input (auto-focused) for instant search by name, category, or description
+- Grouped by category with sticky headers (same groups as sidebar)
+- Keyboard navigation: arrow keys to move, Enter to select, Escape to close
+- Clicking a node inserts it at the right-click position and dismisses the popup
+- Popup clamped to viewport edges to prevent overflow
+
+### Feature B — Connection-Drop Auto-Complete
+**Problem:** When dragging a connection from an output port and releasing on empty canvas, nothing happens. Missed opportunity for streamlined pipeline building.
+
+**Solution:** When a connection drag ends without connecting to a target port, the same node picker popup opens but **pre-filtered to only nodes with compatible input ports**:
+- Only nodes with an input port matching the source output port type are listed
+- Selecting a node places it at the drop position AND auto-connects the dragged port to the first compatible input port
+- Port type hint displayed at top of popup (e.g., "Showing nodes with DataFrame input port")
+- Filter text box still works for further narrowing within compatible nodes
+- If no compatible nodes exist, shows "No compatible nodes for [PortType]" message
+
+**Technical approach:**
+- New `NodePickerPopup` component in `frontend/src/components/canvas/`
+- React Flow `onConnectStart` tracks pending connection source (node + handle)
+- React Flow `onConnectEnd` detects drops on empty canvas (not on a handle element)
+- React Flow `onPaneContextMenu` handles right-click on empty pane
+- After node creation from connection drop, `requestAnimationFrame` reads latest store state to get the new node ID, then calls `onConnect` programmatically
+
+**Files changed:**
+- `frontend/src/components/canvas/NodePickerPopup.tsx` — new component
+- `frontend/src/components/canvas/Canvas.tsx` — added state, event handlers, popup rendering
+
+---
+
 ## Archive
 
 _Completed ideas move here with implementation notes._
@@ -150,3 +189,4 @@ _Completed ideas move here with implementation notes._
 - **Idea 1 (Orange Naming)** — Completed 2026-04-03. 27 nodes renamed.
 - **Idea 2 (New Nodes)** — Completed 2026-04-04. 29 Orange-inspired nodes added (total: 81 nodes).
 - **Idea 3 (Smart Wizard)** — Completed 2026-04-04. 7-step guided pipeline builder + duplicate blank fix.
+- **Idea 4 (Canvas Quick Node Picker)** — Completed 2026-04-04. Right-click picker + connection-drop auto-complete.
