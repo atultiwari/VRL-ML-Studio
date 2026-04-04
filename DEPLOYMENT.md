@@ -18,7 +18,7 @@ Each browser tab gets an isolated workspace automatically via cookie.
 ### Prerequisites
 
 - A VPS with Docker and Docker Compose installed
-- A domain pointing to your VPS IP (optional but recommended)
+- A domain or subdomain pointing to your VPS IP
 
 ### Quick Start
 
@@ -27,58 +27,116 @@ Each browser tab gets an isolated workspace automatically via cookie.
 git clone <your-repo-url> vrl-ml-studio
 cd vrl-ml-studio
 
-# 2. Deploy
+# 2. Deploy (app listens on port 3080 internally)
 docker compose -f docker-compose.prod.yml up -d --build
+
+# 3. Point your VPS reverse proxy to port 3080 (see below)
 ```
 
-That's it. The app is available on port 80.
-
-### What happens under the hood
-
-```
-                    ┌──────────────────────��───────┐
-  Browser ────────► │  nginx (port 80)             │
-                    │                              │
-                    │  /           → static files   │
-                    │  /api/*      → backend:8000   │
-                    │  /ws         → backend:8000   │
-                    └──────────────────────────────┘
-                                   │
-                                   ▼
-                    ┌──────────────────────────────┐
-                    │  FastAPI backend (internal)   │
-                    │  - 4 Uvicorn workers          │
-                    │  - tenant isolation via cookie │
-                    ��──────────────────────────────┘
-```
-
-- **Single port (80):** Nginx serves the built frontend and proxies API/WebSocket requests to the backend.
-- **No CORS needed:** Everything goes through the same origin.
-- **Cookies work automatically:** Nginx passes cookies between browser and backend.
-- **Tenant isolation:** Each visitor gets a unique workspace. No login required.
-
-### With HTTPS (recommended for public access)
-
-If you have a domain, add a reverse proxy with SSL in front. The simplest options:
-
-**Option A: Caddy (auto HTTPS)**
+To use a different port:
 ```bash
-# Install Caddy on the VPS, then:
-cat > /etc/caddy/Caddyfile << 'EOF'
-demo.example.com {
-    reverse_proxy localhost:80
+APP_PORT=8080 docker compose -f docker-compose.prod.yml up -d --build
+```
+
+### Architecture
+
+The app runs on an internal port (default 3080). Your VPS's main
+reverse proxy (nginx, Apache, Caddy, or Hostinger's built-in proxy)
+routes your domain/subdomain to it.
+
+```
+  Browser
+    │
+    ▼
+┌───────────────────────────────┐
+│  VPS reverse proxy (port 80)  │  ← your existing nginx/Apache/Caddy
+│  demo.example.com ──────────────► localhost:3080
+└───────────────────────────────┘
+    │
+    ▼
+┌───────────────────────────────┐
+│  App nginx (port 3080)        │  ← inside Docker
+│                               │
+│  /          → static files    │
+│  /api/*     → backend:8000    │
+│  /ws        → backend:8000    │
+└───────────────────────────────┘
+    │
+    ▼
+┌───────────────────────────────┐
+│  FastAPI backend (internal)   │
+│  - 4 Uvicorn workers          │
+│  - tenant isolation via cookie │
+└───────────────────────────────┘
+```
+
+### VPS Reverse Proxy Configuration
+
+Your VPS likely already has a reverse proxy serving other projects on
+port 80/443. Add the VRL ML Studio site to it.
+
+**Hostinger VPS (via hPanel)**
+
+If Hostinger provides a Docker Manager or reverse proxy UI, point your
+domain/subdomain to `localhost:3080`. If you manage nginx manually:
+
+**nginx (most common on VPS)**
+
+```nginx
+server {
+    listen 80;
+    server_name mlstudio.yourdomain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket support
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Upload size (match app's 100MB limit)
+        client_max_body_size 100M;
+
+        # Longer timeout for ML pipeline execution
+        proxy_read_timeout 300s;
+    }
 }
-EOF
-sudo systemctl restart caddy
 ```
 
-**Option B: Nginx + Certbot**
+Then add HTTPS:
 ```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d demo.example.com
+sudo certbot --nginx -d mlstudio.yourdomain.com
 ```
 
-In both cases, the Docker setup stays unchanged — the external proxy handles SSL and forwards to port 80.
+**Caddy (auto HTTPS, zero config)**
+
+```
+mlstudio.yourdomain.com {
+    reverse_proxy localhost:3080
+}
+```
+
+**Apache**
+
+```apache
+<VirtualHost *:80>
+    ServerName mlstudio.yourdomain.com
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:3080/
+    ProxyPassReverse / http://127.0.0.1:3080/
+
+    # WebSocket
+    RewriteEngine On
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*) ws://127.0.0.1:3080/$1 [P,L]
+</VirtualHost>
+```
 
 ### Data Persistence
 
@@ -119,10 +177,10 @@ Storage layout on the server:
 ```
 /root/vrl-projects/
 └── tenants/
-    ├── a1b2c3d4/          ← Visitor A
+    ├── a1b2c3d4/          <- Visitor A
     │   ├── my-project/
     │   └── iris-demo/
-    ├── e5f6g7h8/          ← Visitor B
+    ├── e5f6g7h8/          <- Visitor B
     │   └── housing-model/
     └── ...
 ```
@@ -131,7 +189,7 @@ Storage layout on the server:
 
 For a demo with ~10 concurrent users:
 - **CPU:** 2 vCPUs minimum
-- **RAM:** 2 GB minimum (4 GB recommended — ML model training uses memory)
+- **RAM:** 2 GB minimum (4 GB recommended -- ML model training uses memory)
 - **Disk:** 10 GB for the app + data volumes
 - **Network:** No special requirements
 
@@ -148,7 +206,8 @@ To remove tenant data older than 7 days (optional cron job):
 
 | Issue | Fix |
 |-------|-----|
-| Port 80 already in use | `sudo lsof -i :80` to find what's using it |
-| WebSocket not connecting | Check nginx proxy headers — ensure `Upgrade` and `Connection` are passed |
-| Cookie not persisting | Ensure you're not mixing HTTP/HTTPS — use one consistently |
+| Port 3080 already in use | Change via `APP_PORT=9090 docker compose -f docker-compose.prod.yml up -d --build` |
+| WebSocket not connecting | Ensure your VPS reverse proxy passes `Upgrade` and `Connection` headers (see nginx config above) |
+| Cookie not persisting | Ensure you're not mixing HTTP/HTTPS -- use one consistently |
 | Stale frontend after update | Hard refresh (Ctrl+Shift+R) or clear browser cache |
+| 502 Bad Gateway | Backend may still be starting -- wait for healthcheck (`docker compose -f docker-compose.prod.yml logs backend`) |

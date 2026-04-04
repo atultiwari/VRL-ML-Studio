@@ -5,7 +5,12 @@
 #
 # The frontend is built into static files and served by nginx.
 # Nginx proxies /api/* → backend:8000 and /ws → backend:8000/ws,
-# so everything runs on a single port (80). No CORS needed.
+# so everything runs on a single port. No CORS needed.
+#
+# The exposed port defaults to 3080. Override via APP_PORT env var:
+#   APP_PORT=8080 docker compose -f docker-compose.prod.yml up -d --build
+#
+# Then point your VPS reverse proxy (nginx/Apache/Caddy) to this port.
 
 services:
   backend:
@@ -40,7 +45,7 @@ services:
         # Empty — frontend derives ws(s)://hostname/ws from page origin
         VITE_WS_URL: ""
     ports:
-      - "80:80"
+      - "${APP_PORT:-3080}:80"
     depends_on:
       backend:
         condition: service_healthy
