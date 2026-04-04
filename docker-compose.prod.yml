@@ -1,16 +1,16 @@
-# docker-compose.prod.yml — Production deployment (VPS / remote hosting)
+# docker-compose.prod.yml — Production deployment with Traefik
 #
 # Usage:
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
-# The frontend is built into static files and served by nginx.
-# Nginx proxies /api/* → backend:8000 and /ws → backend:8000/ws,
-# so everything runs on a single port. No CORS needed.
+# Prerequisites:
+#   - Traefik running as a reverse proxy with the "traefik-proxy" Docker network
+#   - DNS A record for your subdomain pointing to the VPS IP
+#   - Traefik configured with a "letsencrypt" certificate resolver
 #
-# The exposed port defaults to 3080. Override via APP_PORT env var:
-#   APP_PORT=8080 docker compose -f docker-compose.prod.yml up -d --build
-#
-# Then point your VPS reverse proxy (nginx/Apache/Caddy) to this port.
+# The frontend is built into static files and served by an internal nginx.
+# Nginx proxies /api/* and /ws to the backend. Traefik handles HTTPS and
+# routes the domain to the frontend container.
 
 services:
   backend:
@@ -24,7 +24,6 @@ services:
       - BACKEND_PORT=8000
       - BACKEND_RELOAD=false
       - VRL_PROJECTS_DIR=/root/vrl-projects
-      # Not needed in prod (nginx handles same-origin), but harmless as fallback
       - CORS_ORIGINS=
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
     healthcheck:
@@ -34,22 +33,35 @@ services:
       retries: 5
       start_period: 15s
     restart: unless-stopped
+    networks:
+      - internal
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        # /api prefix — nginx strips it when proxying to backend
         VITE_API_URL: /api
-        # Empty — frontend derives ws(s)://hostname/ws from page origin
         VITE_WS_URL: ""
-    ports:
-      - "${APP_PORT:-3080}:80"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vrl-ml-studio.rule=Host(`mlstudio.vedantresearchlabs.com`)
+      - traefik.http.routers.vrl-ml-studio.entrypoints=websecure
+      - traefik.http.routers.vrl-ml-studio.tls.certresolver=letsencrypt
+      - traefik.http.services.vrl-ml-studio.loadbalancer.server.port=80
+    networks:
+      - traefik-proxy
+      - internal
 
 volumes:
   vrl_projects:
+
+networks:
+  traefik-proxy:
+    external: true
+  internal:
+    internal: true

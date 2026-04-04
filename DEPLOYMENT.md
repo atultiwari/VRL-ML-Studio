@@ -13,134 +13,94 @@ Each browser tab gets an isolated workspace automatically via cookie.
 
 ---
 
-## VPS / Production Deployment
+## VPS / Production Deployment (Traefik + Docker)
+
+This project is configured for deployment behind **Traefik** as a reverse
+proxy with automatic HTTPS via Let's Encrypt.
 
 ### Prerequisites
 
-- A VPS with Docker and Docker Compose installed
-- A domain or subdomain pointing to your VPS IP
+1. A VPS with Docker and Docker Compose installed
+2. Traefik running as a Docker container with:
+   - A Docker network named `traefik-proxy`
+   - A certificate resolver named `letsencrypt`
+   - An entrypoint named `websecure` (port 443)
+3. A DNS **A record** for your subdomain pointing to the VPS IP:
+   - `mlstudio.vedantresearchlabs.com` -> `<VPS_IP>`
 
-### Quick Start
+### Deploy
 
 ```bash
 # 1. Clone the repo on your VPS
 git clone <your-repo-url> vrl-ml-studio
 cd vrl-ml-studio
 
-# 2. Deploy (app listens on port 3080 internally)
+# 2. Build and start
 docker compose -f docker-compose.prod.yml up -d --build
-
-# 3. Point your VPS reverse proxy to port 3080 (see below)
 ```
 
-To use a different port:
+The app will be live at `https://mlstudio.vedantresearchlabs.com/` with
+a valid SSL certificate.
+
+### How it works
+
+```
+  Browser (https://mlstudio.vedantresearchlabs.com)
+    |
+    v
++-------------------------------+
+|  Traefik (port 443)           |  <- your existing Traefik instance
+|  TLS termination              |
+|  Host rule match              |
++-------------------------------+
+    |
+    v
++-------------------------------+
+|  App nginx (port 80, internal)|  <- frontend container
+|                               |
+|  /          -> static files   |
+|  /api/*     -> backend:8000   |
+|  /ws        -> backend:8000   |
++-------------------------------+
+    |
+    v
++-------------------------------+
+|  FastAPI backend (internal)   |  <- backend container
+|  - 4 Uvicorn workers          |
+|  - tenant isolation via cookie |
++-------------------------------+
+```
+
+**Network isolation:**
+- `traefik-proxy` (external) -- connects Traefik to the frontend container
+- `internal` (internal) -- connects frontend nginx to the backend; backend is not exposed to the internet
+
+### Changing the domain
+
+Edit the Traefik labels in `docker-compose.prod.yml`:
+
+```yaml
+labels:
+  - traefik.http.routers.vrl-ml-studio.rule=Host(`your-subdomain.yourdomain.com`)
+```
+
+Then redeploy:
 ```bash
-APP_PORT=8080 docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### Architecture
+### Updating
 
-The app runs on an internal port (default 3080). Your VPS's main
-reverse proxy (nginx, Apache, Caddy, or Hostinger's built-in proxy)
-routes your domain/subdomain to it.
-
-```
-  Browser
-    │
-    ▼
-┌───────────────────────────────┐
-│  VPS reverse proxy (port 80)  │  ← your existing nginx/Apache/Caddy
-│  demo.example.com ──────────────► localhost:3080
-└───────────────────────────────┘
-    │
-    ▼
-┌───────────────────────────────┐
-│  App nginx (port 3080)        │  ← inside Docker
-│                               │
-│  /          → static files    │
-│  /api/*     → backend:8000    │
-│  /ws        → backend:8000    │
-└───────────────────────────────┘
-    │
-    ▼
-┌───────────────────────────────┐
-│  FastAPI backend (internal)   │
-│  - 4 Uvicorn workers          │
-│  - tenant isolation via cookie │
-└───────────────────────────────┘
-```
-
-### VPS Reverse Proxy Configuration
-
-Your VPS likely already has a reverse proxy serving other projects on
-port 80/443. Add the VRL ML Studio site to it.
-
-**Hostinger VPS (via hPanel)**
-
-If Hostinger provides a Docker Manager or reverse proxy UI, point your
-domain/subdomain to `localhost:3080`. If you manage nginx manually:
-
-**nginx (most common on VPS)**
-
-```nginx
-server {
-    listen 80;
-    server_name mlstudio.yourdomain.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:3080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # WebSocket support
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-
-        # Upload size (match app's 100MB limit)
-        client_max_body_size 100M;
-
-        # Longer timeout for ML pipeline execution
-        proxy_read_timeout 300s;
-    }
-}
-```
-
-Then add HTTPS:
 ```bash
-sudo certbot --nginx -d mlstudio.yourdomain.com
-```
-
-**Caddy (auto HTTPS, zero config)**
-
-```
-mlstudio.yourdomain.com {
-    reverse_proxy localhost:3080
-}
-```
-
-**Apache**
-
-```apache
-<VirtualHost *:80>
-    ServerName mlstudio.yourdomain.com
-
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:3080/
-    ProxyPassReverse / http://127.0.0.1:3080/
-
-    # WebSocket
-    RewriteEngine On
-    RewriteCond %{HTTP:Upgrade} =websocket [NC]
-    RewriteRule /(.*) ws://127.0.0.1:3080/$1 [P,L]
-</VirtualHost>
+cd vrl-ml-studio
+git pull
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 ### Data Persistence
 
-Project data is stored in a Docker named volume `vrl_projects`. It persists across container rebuilds.
+Project data is stored in a Docker named volume `vrl_projects`. It persists
+across container rebuilds.
 
 ```bash
 # Inspect volume
@@ -153,14 +113,6 @@ docker run --rm -v vrl-ml-studio_vrl_projects:/data -v $(pwd):/backup \
 # Restore
 docker run --rm -v vrl-ml-studio_vrl_projects:/data -v $(pwd):/backup \
   alpine sh -c "cd /data && tar xzf /backup/vrl-projects-backup.tar.gz"
-```
-
-### Updating
-
-```bash
-cd vrl-ml-studio
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 ### Multi-User Workspace Isolation
@@ -176,13 +128,12 @@ When hosted on a VPS, each visitor automatically gets an isolated workspace:
 Storage layout on the server:
 ```
 /root/vrl-projects/
-└── tenants/
-    ├── a1b2c3d4/          <- Visitor A
-    │   ├── my-project/
-    │   └── iris-demo/
-    ├── e5f6g7h8/          <- Visitor B
-    │   └── housing-model/
-    └── ...
+  tenants/
+    a1b2c3d4/          <- Visitor A
+      my-project/
+      iris-demo/
+    e5f6g7h8/          <- Visitor B
+      housing-model/
 ```
 
 ### Resource Considerations
@@ -206,8 +157,9 @@ To remove tenant data older than 7 days (optional cron job):
 
 | Issue | Fix |
 |-------|-----|
-| Port 3080 already in use | Change via `APP_PORT=9090 docker compose -f docker-compose.prod.yml up -d --build` |
-| WebSocket not connecting | Ensure your VPS reverse proxy passes `Upgrade` and `Connection` headers (see nginx config above) |
-| Cookie not persisting | Ensure you're not mixing HTTP/HTTPS -- use one consistently |
+| 404 from Traefik | Check that `traefik-proxy` network exists (`docker network ls`) and frontend is on it |
+| WebSocket not connecting | Traefik v2+ handles WS automatically; check browser console for the URL it's connecting to |
+| Cookie not persisting | Ensure HTTPS is working (cookies are `SameSite=lax`; mixed HTTP/HTTPS can break them) |
 | Stale frontend after update | Hard refresh (Ctrl+Shift+R) or clear browser cache |
-| 502 Bad Gateway | Backend may still be starting -- wait for healthcheck (`docker compose -f docker-compose.prod.yml logs backend`) |
+| 502 Bad Gateway | Backend may still be starting -- check with `docker compose -f docker-compose.prod.yml logs backend` |
+| SSL certificate not issued | Verify DNS A record resolves to VPS IP: `dig mlstudio.vedantresearchlabs.com` |
