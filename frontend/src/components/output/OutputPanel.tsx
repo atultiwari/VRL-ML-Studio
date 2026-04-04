@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, BarChart2, Table, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useExecutionStore, type NodeOutput } from '@/store/executionStore'
@@ -26,6 +26,30 @@ export function OutputPanel() {
   const activePortId = portId ?? (portOutputs ? Object.keys(portOutputs)[0] : undefined)
   const output: NodeOutput | undefined = activePortId ? portOutputs?.[activePortId] : undefined
 
+  // ── Resize logic ──────────────────────────────────────────────────────────
+  const [panelHeight, setPanelHeight] = useState(256) // 16rem default
+  const isDragging = useRef(false)
+  const startY = useRef(0)
+  const startHeight = useRef(0)
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    isDragging.current = true
+    startY.current = e.clientY
+    startHeight.current = panelHeight
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }, [panelHeight])
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return
+    const delta = startY.current - e.clientY
+    const newHeight = Math.max(120, Math.min(startHeight.current + delta, window.innerHeight * 0.7))
+    setPanelHeight(newHeight)
+  }, [])
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false
+  }, [])
+
   // Show panel if there are outputs OR if the node has an error
   if (!nodeId || (!portOutputs && !nodeError)) return null
 
@@ -34,12 +58,20 @@ export function OutputPanel() {
   return (
     <div
       className={cn(
-        'flex h-64 flex-col',
+        'flex flex-col',
         'border-t',
         nodeStatus === 'error' ? 'border-red-500/40' : 'border-border',
         'bg-card'
       )}
+      style={{ height: panelHeight }}
     >
+      {/* Resize handle */}
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className="h-1.5 shrink-0 cursor-row-resize bg-transparent hover:bg-primary/20 active:bg-primary/30 transition-colors touch-none"
+      />
       {/* Header */}
       <div className={cn(
         'flex items-center gap-2 border-b px-3 py-1.5',

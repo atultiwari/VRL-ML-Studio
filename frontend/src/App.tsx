@@ -32,6 +32,17 @@ export function App() {
   const [exportOpen, setExportOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
+  const setSidebarOpen                  = useUIStore(s => s.setSidebarOpen)
+
+  // Auto-collapse sidebar on small screens
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)')
+    if (mq.matches) setSidebarOpen(false)
+    const handler = (e: MediaQueryListEvent) => setSidebarOpen(!e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [setSidebarOpen])
+
   const { manifests, loading, error, refresh: refreshNodes } = useNodeRegistry()
   const tenant                        = useTenant()
   const { executePipeline }           = useWebSocket()

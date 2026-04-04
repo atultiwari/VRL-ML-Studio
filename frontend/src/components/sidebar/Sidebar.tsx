@@ -2,6 +2,8 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ChevronDown,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Database,
   FlaskConical,
   LayoutGrid,
@@ -17,6 +19,7 @@ import { CATEGORY_GROUPS } from '@/lib/types'
 import type { NodeManifestWithUI } from '@/lib/types'
 import { NodeLibraryItem } from './NodeLibraryItem'
 import { importNodePackage } from '@/lib/api'
+import { useUIStore } from '@/store/uiStore'
 
 // Icon mapping for each category group label
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -42,6 +45,9 @@ export function Sidebar({ manifests, loading, error, onRefresh }: SidebarProps) 
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const sidebarOpen = useUIStore(s => s.sidebarOpen)
+  const toggleSidebar = useUIStore(s => s.toggleSidebar)
 
   const handleImportClick = useCallback(() => {
     fileInputRef.current?.click()
@@ -90,6 +96,37 @@ export function Sidebar({ manifests, loading, error, onRefresh }: SidebarProps) 
     )
   }, [manifests, query])
 
+  // Collapsed sidebar: show only category icons
+  if (!sidebarOpen) {
+    return (
+      <aside className="flex w-10 shrink-0 flex-col border-r border-border bg-card">
+        <button
+          onClick={toggleSidebar}
+          className="flex items-center justify-center border-b border-border py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          title="Expand node library"
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </button>
+        <nav className="flex flex-1 flex-col items-center gap-1 overflow-y-auto py-2">
+          {CATEGORY_GROUPS.map(group => (
+            <button
+              key={group.label}
+              onClick={toggleSidebar}
+              className={cn(
+                'flex items-center justify-center rounded-md p-1.5 transition-colors',
+                'text-muted-foreground hover:bg-muted hover:text-foreground',
+                group.colorClass
+              )}
+              title={group.label}
+            >
+              {CATEGORY_ICONS[group.label]}
+            </button>
+          ))}
+        </nav>
+      </aside>
+    )
+  }
+
   return (
     <aside
       className={cn(
@@ -114,6 +151,13 @@ export function Sidebar({ manifests, loading, error, onRefresh }: SidebarProps) 
               ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
               : <PackagePlus className="h-3.5 w-3.5" />
             }
+          </button>
+          <button
+            onClick={toggleSidebar}
+            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Collapse node library"
+          >
+            <ChevronsLeft className="h-3.5 w-3.5" />
           </button>
           <input
             ref={fileInputRef}
