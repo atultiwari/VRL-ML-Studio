@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Zap } from 'lucide-react'
+import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, User, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -11,6 +11,7 @@ interface ToolbarProps {
   backendStatus: 'connecting' | 'online' | 'offline'
   nodesLoaded?: number
   selectedNodeCount?: number
+  workspaceName?: string
   onRun?: () => void
   onRunSelected?: () => void
   onSave?: () => void
@@ -19,7 +20,7 @@ interface ToolbarProps {
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, onRun, onRunSelected, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -176,8 +177,16 @@ export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, onR
         </Button>
       </div>
 
-      {/* ── Right: Status ── */}
+      {/* ── Right: Workspace + Status ── */}
       <div className="flex items-center gap-3">
+        {workspaceName && (
+          <div className="hidden items-center gap-1.5 sm:flex">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+            <Badge variant="outline" className="font-mono text-[10px]">
+              {workspaceName}
+            </Badge>
+          </div>
+        )}
         {nodesLoaded !== undefined && backendStatus === 'online' && (
           <span className="hidden text-xs text-muted-foreground sm:block">
             {nodesLoaded} node{nodesLoaded !== 1 ? 's' : ''}

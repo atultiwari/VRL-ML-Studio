@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     backend_reload: bool = True
     vrl_projects_dir: str = str(Path.home() / "vrl-projects")
     vrl_studio_version: str = "1.0.0"
+    cors_origins: str = ""  # comma-separated extra origins (e.g. "https://demo.example.com")
 
     # Absolute path to the builtin node packages directory
     @property

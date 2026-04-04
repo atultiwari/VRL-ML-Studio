@@ -1,0 +1,50 @@
+# docker-compose.prod.yml — Production deployment (VPS / remote hosting)
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# The frontend is built into static files and served by nginx.
+# Nginx proxies /api/* → backend:8000 and /ws → backend:8000/ws,
+# so everything runs on a single port (80). No CORS needed.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - vrl_projects:/root/vrl-projects
+    environment:
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+      - BACKEND_RELOAD=false
+      - VRL_PROJECTS_DIR=/root/vrl-projects
+      # Not needed in prod (nginx handles same-origin), but harmless as fallback
+      - CORS_ORIGINS=
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        # /api prefix — nginx strips it when proxying to backend
+        VITE_API_URL: /api
+        # Empty — frontend derives ws(s)://hostname/ws from page origin
+        VITE_WS_URL: ""
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  vrl_projects:

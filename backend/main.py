@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.logging import get_logger
 from core.settings import settings
+from core.tenant import COOKIE_NAME, TenantMiddleware, tenant_display_name
 from routers import execute, export, nodes, project, upload
 from services.cache import CacheService
 from services.dag_executor import DAGExecutor
@@ -45,10 +46,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
+# ── Middleware ────────────────────────────────────────────────────────────────
+# Tenant middleware must be added BEFORE CORS so it can set cookies on responses.
+app.add_middleware(TenantMiddleware)
+
+# CORS — origins are configurable via CORS_ORIGINS env var (comma-separated).
+_default_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+_extra = settings.cors_origins.split(",") if settings.cors_origins else []
+_origins = _default_origins + [o.strip() for o in _extra if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,4 +78,15 @@ async def health() -> dict:
         "status": "ok",
         "version": settings.vrl_studio_version,
         "nodes_loaded": len(registry),
+    }
+
+
+# ── Tenant info ──────────────────────────────────────────────────────────────
+@app.get("/tenant/info", tags=["tenant"])
+async def tenant_info(request: Request) -> dict:
+    """Return the current tenant ID and human-friendly workspace name."""
+    tenant_id: str = request.state.tenant_id
+    return {
+        "tenant_id": tenant_id,
+        "workspace_name": tenant_display_name(tenant_id),
     }

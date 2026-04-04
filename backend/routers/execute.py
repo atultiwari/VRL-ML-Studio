@@ -24,6 +24,7 @@ async def execute_pipeline(request_data: ExecuteRequest, request: Request) -> JS
     registry = request.app.state.registry
     cache    = request.app.state.cache
     executor = DAGExecutor(registry=registry, cache=cache)
+    tenant_id: str = getattr(request.state, "tenant_id", "")
 
     loop = asyncio.get_event_loop()
 
@@ -41,7 +42,7 @@ async def execute_pipeline(request_data: ExecuteRequest, request: Request) -> JS
             None,
             lambda: executor.execute(
                 request_data.pipeline,
-                context={"project_path": request_data.project_path},
+                context={"project_path": request_data.project_path, "tenant_id": tenant_id},
                 on_node_done=on_done,
                 on_node_error=on_error,
                 target_node_ids=request_data.target_node_ids,
@@ -61,7 +62,8 @@ async def execute_pipeline(request_data: ExecuteRequest, request: Request) -> JS
 @router.websocket("/ws")
 async def websocket_execute(websocket: WebSocket) -> None:
     await websocket.accept()
-    logger.info("WebSocket client connected")
+    tenant_id = websocket.cookies.get("vrl_tenant_id", "")
+    logger.info("WebSocket client connected (tenant=%s)", tenant_id or "unknown")
 
     ws_alive = True
 
@@ -91,7 +93,7 @@ async def websocket_execute(websocket: WebSocket) -> None:
                 continue
 
             if msg_type == "execute":
-                await _run_pipeline(websocket, data, send)
+                await _run_pipeline(websocket, data, send, tenant_id)
                 continue
 
             await send({"type": "error", "message": f"Unknown message type: {msg_type!r}"})
@@ -105,7 +107,7 @@ async def websocket_execute(websocket: WebSocket) -> None:
         await send({"type": "error", "message": str(exc)})
 
 
-async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
+async def _run_pipeline(websocket: WebSocket, data: dict, send: Any, tenant_id: str = "") -> None:
     try:
         pipeline = PipelineJSON(**data["pipeline"])
     except Exception as exc:
@@ -158,7 +160,7 @@ async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
             None,
             lambda: executor.execute(
                 pipeline,
-                context={"project_path": data.get("project_path", "")},
+                context={"project_path": data.get("project_path", ""), "tenant_id": tenant_id},
                 on_node_start=on_start,
                 on_node_done=on_done,
                 on_node_error=on_error,

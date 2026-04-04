@@ -3,7 +3,16 @@ import { useExecutionStore, type PortOutputMap } from '@/store/executionStore'
 import { usePipelineStore } from '@/store/pipelineStore'
 import type { PipelineJSON } from '@/lib/types'
 
-const WS_URL = (import.meta.env.VITE_WS_URL ?? 'ws://localhost:8000') + '/ws'
+// In production (nginx proxy), VITE_WS_URL is empty — derive from page origin.
+// In dev mode, VITE_WS_URL points directly to the backend (ws://localhost:8000).
+function resolveWsUrl(): string {
+  const envUrl = import.meta.env.VITE_WS_URL as string | undefined
+  if (envUrl) return envUrl + '/ws'
+  // Derive from current page origin: https → wss, http → ws
+  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${proto}//${window.location.host}/ws`
+}
+const WS_URL = resolveWsUrl()
 const RECONNECT_DELAY_MS = 3000
 const EXECUTION_TIMEOUT_MS = 120_000 // 2 minutes
 

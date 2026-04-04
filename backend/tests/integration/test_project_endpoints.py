@@ -18,13 +18,15 @@ def projects_dir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 async def client(projects_dir: Path):
-    with patch("routers.project.PROJECTS_DIR", projects_dir):
-        with patch("routers.project._ensure_projects_dir", lambda: projects_dir):
-            async with AsyncClient(
-                transport=ASGITransport(app=app),
-                base_url="http://test",
-            ) as c:
-                yield c
+    # Patch the tenant-scoped projects dir to use our temp dir.
+    # The TenantMiddleware still runs and sets request.state.tenant_id,
+    # but _tenant_projects_dir will return our temp dir regardless.
+    with patch("routers.project._tenant_projects_dir", return_value=projects_dir):
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://test",
+        ) as c:
+            yield c
 
 
 @pytest.mark.asyncio

@@ -74,7 +74,8 @@ class DAGExecutor:
         for node_id in order:
             node = pipeline.get_node(node_id)
 
-            cached = self.cache.get(node_id, node.parameters)
+            tenant_id = context.get("tenant_id", "")
+            cached = self.cache.get(node_id, node.parameters, tenant_id=tenant_id)
             if cached is not None:
                 outputs[node_id] = cached
                 logger.info("Node '%s' — using cached output", node_id)
@@ -99,7 +100,7 @@ class DAGExecutor:
                     on_node_error(node_id, str(exc))
                 raise DAGExecutionError(node_id, str(exc)) from exc
 
-            self.cache.set(node_id, node.parameters, result)
+            self.cache.set(node_id, node.parameters, result, tenant_id=tenant_id)
             outputs[node_id] = result
 
             if on_node_done:

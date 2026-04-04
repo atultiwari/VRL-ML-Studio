@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -40,8 +40,16 @@ class BranchBody(BaseModel):
 logger = get_logger(__name__)
 router = APIRouter(tags=["project"])
 
-PROJECTS_DIR = Path(settings.vrl_projects_dir)
+BASE_PROJECTS_DIR = Path(settings.vrl_projects_dir)
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+
+
+def _tenant_projects_dir(request: Request) -> Path:
+    """Return the projects directory scoped to the current tenant."""
+    tenant_id: str = request.state.tenant_id
+    tenant_dir = BASE_PROJECTS_DIR / "tenants" / tenant_id
+    tenant_dir.mkdir(parents=True, exist_ok=True)
+    return tenant_dir
 
 GITIGNORE_CONTENT = """\
 outputs/
@@ -52,9 +60,21 @@ __pycache__/
 """
 
 
-def _ensure_projects_dir() -> Path:
-    PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
-    return PROJECTS_DIR
+def _ensure_projects_dir(request: Request) -> Path:
+    """Return the tenant-scoped projects directory, creating it if needed."""
+    return _tenant_projects_dir(request)
+
+
+def _validate_tenant_path(request: Request, project_path: str) -> Path:
+    """Ensure the given project_path belongs to the current tenant.
+
+    Raises HTTPException 403 if the path is outside the tenant's directory.
+    """
+    tenant_dir = _tenant_projects_dir(request)
+    resolved = Path(project_path).resolve()
+    if not str(resolved).startswith(str(tenant_dir.resolve())):
+        raise HTTPException(403, "Access denied: project belongs to a different workspace")
+    return resolved
 
 
 def _read_project_meta(project_path: Path) -> dict[str, Any]:
@@ -129,8 +149,8 @@ async def dataset_preview(body: DatasetPreviewRequest) -> JSONResponse:
 # ── GET /projects — list all projects ────────────────────────────────────────
 
 @router.get("/projects")
-async def list_projects() -> list[dict[str, Any]]:
-    base = _ensure_projects_dir()
+async def list_projects(request: Request) -> list[dict[str, Any]]:
+    base = _ensure_projects_dir(request)
     projects = []
     for d in sorted(base.iterdir()):
         if not d.is_dir() or not (d / "project.yaml").exists():
@@ -162,12 +182,13 @@ async def list_projects() -> list[dict[str, Any]]:
 
 @router.post("/project/create")
 async def create_project(
+    request: Request,
     name: str,
     description: str = "",
     tags: str = "",  # comma-separated
     template: str = "blank",
 ) -> JSONResponse:
-    base = _ensure_projects_dir()
+    base = _ensure_projects_dir(request)
     # Sanitise project directory name
     safe_name = "".join(c if c.isalnum() or c in "-_ " else "" for c in name).strip()
     safe_name = safe_name.replace(" ", "-").lower()
@@ -228,11 +249,11 @@ async def create_project(
 # ── POST /project/save — save pipeline and commit ───────────────────────────
 
 @router.post("/project/save")
-async def save_project(body: SaveProjectBody) -> JSONResponse:
+async def save_project(body: SaveProjectBody, request: Request) -> JSONResponse:
     project_path = body.project_path
     pipeline = body.pipeline
     message = body.message
-    path = Path(project_path)
+    path = _validate_tenant_path(request, project_path)
     if not path.exists() or not (path / "project.yaml").exists():
         raise HTTPException(404, f"Project not found: {project_path}")
 
@@ -258,8 +279,8 @@ async def save_project(body: SaveProjectBody) -> JSONResponse:
 # ── GET /project/history — git commit history ───────────────────────────────
 
 @router.get("/project/history")
-async def project_history(project_path: str) -> list[dict[str, Any]]:
-    path = Path(project_path)
+async def project_history(project_path: str, request: Request) -> list[dict[str, Any]]:
+    path = _validate_tenant_path(request, project_path)
     if not path.exists():
         raise HTTPException(404, f"Project not found: {project_path}")
 
@@ -271,10 +292,11 @@ async def project_history(project_path: str) -> list[dict[str, Any]]:
 
 @router.post("/project/checkout")
 async def checkout_version(
+    request: Request,
     project_path: str,
     commit_hash: str,
 ) -> JSONResponse:
-    path = Path(project_path)
+    path = _validate_tenant_path(request, project_path)
     if not path.exists():
         raise HTTPException(404, f"Project not found: {project_path}")
 
@@ -308,10 +330,11 @@ async def checkout_version(
 
 @router.post("/project/branch")
 async def create_branch(
+    request: Request,
     project_path: str,
     branch_name: str,
 ) -> JSONResponse:
-    path = Path(project_path)
+    path = _validate_tenant_path(request, project_path)
     if not path.exists():
         raise HTTPException(404, f"Project not found: {project_path}")
 
@@ -326,8 +349,8 @@ async def create_branch(
 # ── GET /project/info — current project details ─────────────────────────────
 
 @router.get("/project/info")
-async def project_info(project_path: str) -> JSONResponse:
-    path = Path(project_path)
+async def project_info(project_path: str, request: Request) -> JSONResponse:
+    path = _validate_tenant_path(request, project_path)
     if not path.exists():
         raise HTTPException(404, f"Project not found: {project_path}")
 

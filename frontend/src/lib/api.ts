@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,  // send tenant cookie with every request
   timeout: 30_000,
 })
 
@@ -23,6 +24,16 @@ export async function checkHealth(): Promise<{
   nodes_loaded: number
 }> {
   const { data } = await api.get('/health')
+  return data
+}
+
+export interface TenantInfo {
+  tenant_id: string
+  workspace_name: string
+}
+
+export async function getTenantInfo(): Promise<TenantInfo> {
+  const { data } = await api.get<TenantInfo>('/tenant/info')
   return data
 }
 

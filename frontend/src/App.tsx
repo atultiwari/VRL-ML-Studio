@@ -12,6 +12,7 @@ import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
 import { SmartWizard } from '@/components/wizard/SmartWizard'
 import { checkHealth } from '@/lib/api'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
+import { useTenant } from '@/hooks/useTenant'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { usePipelineStore } from '@/store/pipelineStore'
 import { useUIStore } from '@/store/uiStore'
@@ -32,6 +33,7 @@ export function App() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
   const { manifests, loading, error, refresh: refreshNodes } = useNodeRegistry()
+  const tenant                        = useTenant()
   const { executePipeline }           = useWebSocket()
   const selectedNodeId                = useUIStore(s => s.selectedNodeId)
   const setRunToHereHandler           = useUIStore(s => s.setRunToHereHandler)
@@ -200,6 +202,7 @@ export function App() {
         <Toolbar
           backendStatus={backendStatus}
           nodesLoaded={nodesLoaded}
+          workspaceName={tenant?.workspace_name}
           onGoHome={handleGoHome}
         />
         <ProjectDashboard onOpenProject={handleOpenProject} onOpenWizard={handleOpenWizard} />
@@ -214,6 +217,7 @@ export function App() {
         backendStatus={backendStatus}
         nodesLoaded={nodesLoaded}
         selectedNodeCount={selectedNodeCount}
+        workspaceName={tenant?.workspace_name}
         onRun={handleRun}
         onRunSelected={handleRunSelected}
         onSave={handleSave}
