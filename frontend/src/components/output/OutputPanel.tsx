@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { BarChart2, Table, X } from 'lucide-react'
+import { AlertTriangle, BarChart2, Table, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useExecutionStore, type NodeOutput } from '@/store/executionStore'
 import { usePipelineStore } from '@/store/pipelineStore'
@@ -10,6 +10,8 @@ export function OutputPanel() {
   const nodeId       = useExecutionStore(s => s.outputPanelNodeId)
   const portId       = useExecutionStore(s => s.outputPanelPortId)
   const nodeOutputs  = useExecutionStore(s => s.nodeOutputs)
+  const nodeErrors   = useExecutionStore(s => s.nodeErrors)
+  const nodeStatuses = useExecutionStore(s => s.nodeStatuses)
   const close        = useExecutionStore(s => s.closeOutputPanel)
   const openPanel    = useExecutionStore(s => s.openOutputPanel)
 
@@ -17,49 +19,66 @@ export function OutputPanel() {
 
   const node         = useMemo(() => nodes.find(n => n.id === nodeId), [nodes, nodeId])
   const portOutputs  = nodeId ? nodeOutputs[nodeId] : undefined
+  const nodeError    = nodeId ? nodeErrors[nodeId] : undefined
+  const nodeStatus   = nodeId ? nodeStatuses[nodeId] : undefined
 
   // Pick active port output
   const activePortId = portId ?? (portOutputs ? Object.keys(portOutputs)[0] : undefined)
   const output: NodeOutput | undefined = activePortId ? portOutputs?.[activePortId] : undefined
 
-  if (!nodeId || !portOutputs) return null
+  // Show panel if there are outputs OR if the node has an error
+  if (!nodeId || (!portOutputs && !nodeError)) return null
 
-  const portIds = Object.keys(portOutputs)
+  const portIds = portOutputs ? Object.keys(portOutputs) : []
 
   return (
     <div
       className={cn(
         'flex h-64 flex-col',
-        'border-t border-border bg-card'
+        'border-t',
+        nodeStatus === 'error' ? 'border-red-500/40' : 'border-border',
+        'bg-card'
       )}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-border px-3 py-1.5">
-        <span className="text-xs font-medium text-foreground">
+      <div className={cn(
+        'flex items-center gap-2 border-b px-3 py-1.5',
+        nodeStatus === 'error' ? 'border-red-500/20 bg-red-500/5' : 'border-border'
+      )}>
+        {nodeStatus === 'error' && (
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-400" />
+        )}
+        <span className={cn(
+          'text-xs font-medium',
+          nodeStatus === 'error' ? 'text-red-400' : 'text-foreground'
+        )}>
           {node?.data.label ?? nodeId}
+          {nodeStatus === 'error' && ' — Error'}
         </span>
 
-        {/* Port tabs */}
-        <div className="flex gap-1 ml-2">
-          {portIds.map(pid => {
-            const out = portOutputs[pid]
-            return (
-              <button
-                key={pid}
-                onClick={() => openPanel(nodeId, pid)}
-                className={cn(
-                  'flex items-center gap-1 rounded px-2 py-0.5 text-[11px] transition-colors',
-                  activePortId === pid
-                    ? 'bg-primary/20 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                {out?.type === 'plot' ? <BarChart2 className="h-3 w-3" /> : <Table className="h-3 w-3" />}
-                {pid}
-              </button>
-            )
-          })}
-        </div>
+        {/* Port tabs (only when there are outputs) */}
+        {portIds.length > 0 && (
+          <div className="flex gap-1 ml-2">
+            {portIds.map(pid => {
+              const out = portOutputs?.[pid]
+              return (
+                <button
+                  key={pid}
+                  onClick={() => openPanel(nodeId, pid)}
+                  className={cn(
+                    'flex items-center gap-1 rounded px-2 py-0.5 text-[11px] transition-colors',
+                    activePortId === pid
+                      ? 'bg-primary/20 text-primary'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  {out?.type === 'plot' ? <BarChart2 className="h-3 w-3" /> : <Table className="h-3 w-3" />}
+                  {pid}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         <button
           onClick={close}
@@ -71,7 +90,19 @@ export function OutputPanel() {
 
       {/* Content */}
       <div className="flex flex-1 overflow-hidden">
-        {!output && (
+        {nodeError && (
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+            <div className="rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-red-400/70 mb-1">Execution Error</p>
+              <p className="text-xs text-red-300 font-mono whitespace-pre-wrap break-words leading-relaxed">{nodeError}</p>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Check the node&apos;s input connections and parameters, then re-run the pipeline.
+            </p>
+          </div>
+        )}
+
+        {!nodeError && !output && (
           <p className="m-auto text-xs text-muted-foreground">No output</p>
         )}
 

@@ -43,6 +43,7 @@ interface ExecutionStore {
   running: boolean
   nodeStatuses: Record<string, NodeStatus>
   nodeOutputs: Record<string, PortOutputMap>
+  nodeErrors: Record<string, string>     // node_id → error message
   outputPanelNodeId: string | null   // which node's output to show
   outputPanelPortId: string | null   // which port's output to show
 
@@ -50,6 +51,7 @@ interface ExecutionStore {
   setRunning: (v: boolean) => void
   setNodeStatus: (nodeId: string, status: NodeStatus) => void
   setNodeOutputs: (nodeId: string, outputs: PortOutputMap) => void
+  setNodeError: (nodeId: string, error: string) => void
   clearExecution: () => void
 
   // Output panel
@@ -61,6 +63,7 @@ export const useExecutionStore = create<ExecutionStore>((set) => ({
   running: false,
   nodeStatuses: {},
   nodeOutputs: {},
+  nodeErrors: {},
   outputPanelNodeId: null,
   outputPanelPortId: null,
 
@@ -72,8 +75,11 @@ export const useExecutionStore = create<ExecutionStore>((set) => ({
   setNodeOutputs: (nodeId, outputs) =>
     set(s => ({ nodeOutputs: { ...s.nodeOutputs, [nodeId]: outputs } })),
 
+  setNodeError: (nodeId, error) =>
+    set(s => ({ nodeErrors: { ...s.nodeErrors, [nodeId]: error } })),
+
   clearExecution: () =>
-    set({ running: false, nodeStatuses: {}, nodeOutputs: {} }),
+    set({ running: false, nodeStatuses: {}, nodeOutputs: {}, nodeErrors: {} }),
 
   openOutputPanel: (nodeId, portId) =>
     set({ outputPanelNodeId: nodeId, outputPanelPortId: portId ?? null }),

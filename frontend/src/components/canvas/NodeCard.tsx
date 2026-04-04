@@ -40,9 +40,11 @@ function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
       className={cn(
         'relative flex min-w-[160px] flex-col rounded-lg border',
         'bg-[hsl(var(--node-bg))] shadow-md transition-all duration-150',
-        selected
-          ? 'border-primary ring-1 ring-primary/40'
-          : 'border-[hsl(var(--node-border))] hover:border-[hsl(var(--node-border-hover))]'
+        status === 'error'
+          ? 'border-red-500/50 ring-1 ring-red-500/20'
+          : selected
+            ? 'border-primary ring-1 ring-primary/40'
+            : 'border-[hsl(var(--node-border))] hover:border-[hsl(var(--node-border-hover))]'
       )}
     >
       {/* Colour accent bar */}
@@ -76,6 +78,9 @@ function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
             </span>
           )}
           <span className="truncate text-[10px] text-muted-foreground">{manifest.category}</span>
+          {status === 'error' && (
+            <span className="text-[9px] text-red-400 mt-0.5">double-click to view error</span>
+          )}
         </div>
 
         {/* Badge + status dot */}

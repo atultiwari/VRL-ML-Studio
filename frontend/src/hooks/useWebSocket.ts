@@ -122,8 +122,10 @@ export function useWebSocket() {
       clearExecutionTimeout()
       store.setRunning(false)
       const nodeId = msg.node_id as string | undefined
+      const errorMsg = msg.error as string | undefined
       if (nodeId) {
         store.setNodeStatus(nodeId, 'error')
+        if (errorMsg) store.setNodeError(nodeId, errorMsg)
         usePipelineStore.getState().updateNodeStatus(nodeId, 'error')
       }
       // Mark any still-running nodes as idle (they never ran)
@@ -145,6 +147,10 @@ export function useWebSocket() {
 
       if (status === 'success' && msg.output) {
         store.setNodeOutputs(nodeId, msg.output as PortOutputMap)
+      }
+
+      if (status === 'error' && msg.error) {
+        store.setNodeError(nodeId, msg.error as string)
       }
 
       // Mirror status onto the React Flow node data
