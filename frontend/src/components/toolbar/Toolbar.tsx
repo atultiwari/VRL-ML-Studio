@@ -10,14 +10,16 @@ import { useProjectStore } from '@/store/projectStore'
 interface ToolbarProps {
   backendStatus: 'connecting' | 'online' | 'offline'
   nodesLoaded?: number
+  selectedNodeCount?: number
   onRun?: () => void
+  onRunSelected?: () => void
   onSave?: () => void
   onExport?: () => void
   onToggleHistory?: () => void
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, onRun, onRunSelected, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -158,14 +160,19 @@ export function Toolbar({ backendStatus, nodesLoaded, onRun, onSave, onExport, o
           variant="default"
           size="sm"
           disabled={isRunning || nodeCount === 0 || backendStatus !== 'online'}
-          onClick={onRun}
+          onClick={selectedNodeCount > 0 ? onRunSelected : onRun}
           className="gap-1.5"
         >
           {isRunning
             ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
             : <Play className="h-3.5 w-3.5 fill-current" />
           }
-          {isRunning ? 'Running…' : 'Run'}
+          {isRunning
+            ? 'Running…'
+            : selectedNodeCount > 0
+              ? `Run Selected (${selectedNodeCount})`
+              : 'Run'
+          }
         </Button>
       </div>
 

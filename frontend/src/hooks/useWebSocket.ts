@@ -169,8 +169,10 @@ export function useWebSocket() {
     }
   }, [connect])
 
-  /** Send a pipeline execution request over the WebSocket. */
-  const executePipeline = useCallback((pipeline: PipelineJSON) => {
+  /** Send a pipeline execution request over the WebSocket.
+   *  If targetNodeIds is provided, only those nodes and their ancestors are executed.
+   */
+  const executePipeline = useCallback((pipeline: PipelineJSON, targetNodeIds?: string[]) => {
     const ws = wsRef.current
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       console.error('WebSocket not connected — cannot execute pipeline')
@@ -182,7 +184,11 @@ export function useWebSocket() {
     store.clearExecution()
     pipeline.nodes.forEach(n => store.setNodeStatus(n.id, 'idle'))
 
-    ws.send(JSON.stringify({ type: 'execute', pipeline }))
+    const message: Record<string, unknown> = { type: 'execute', pipeline }
+    if (targetNodeIds && targetNodeIds.length > 0) {
+      message.target_node_ids = targetNodeIds
+    }
+    ws.send(JSON.stringify(message))
   }, [])
 
   return { executePipeline }

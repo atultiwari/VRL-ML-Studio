@@ -44,6 +44,7 @@ async def execute_pipeline(request_data: ExecuteRequest, request: Request) -> JS
                 context={"project_path": request_data.project_path},
                 on_node_done=on_done,
                 on_node_error=on_error,
+                target_node_ids=request_data.target_node_ids,
             ),
         )
     except DAGExecutionError as exc:
@@ -148,6 +149,8 @@ async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
         except Exception as exc:
             logger.warning("Failed to send 'error' for node '%s': %s", node_id, exc)
 
+    target_node_ids: list[str] | None = data.get("target_node_ids")
+
     await send({"type": "execution_start", "node_count": len(pipeline.nodes)})
 
     try:
@@ -159,6 +162,7 @@ async def _run_pipeline(websocket: WebSocket, data: dict, send: Any) -> None:
                 on_node_start=on_start,
                 on_node_done=on_done,
                 on_node_error=on_error,
+                target_node_ids=target_node_ids,
             ),
         )
         await send({"type": "execution_done"})

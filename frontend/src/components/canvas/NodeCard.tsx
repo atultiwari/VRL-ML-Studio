@@ -1,9 +1,11 @@
-import { memo, useState, useRef, useEffect } from 'react'
+import { memo, useState, useRef, useEffect, useCallback } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
+import { Play, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PORT_COLORS } from '@/lib/types'
 import type { VrlNodeData } from '@/store/pipelineStore'
 import { usePipelineStore } from '@/store/pipelineStore'
+import { useUIStore } from '@/store/uiStore'
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 
@@ -19,26 +21,40 @@ const STATUS_STYLES = {
 function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
   const { manifest, status, label } = data
   const updateNodeLabel = usePipelineStore(s => s.updateNodeLabel)
+  const onRunToHere = useUIStore(s => s.runToHereHandler)
+  const renamingNodeId = useUIStore(s => s.renamingNodeId)
+  const setRenamingNodeId = useUIStore(s => s.setRenamingNodeId)
 
-  const [editing, setEditing] = useState(false)
+  const isRenaming = renamingNodeId === id
   const [draft, setDraft] = useState(label)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (editing) inputRef.current?.select()
-  }, [editing])
+    if (isRenaming) {
+      setDraft(label)
+      // Small delay to let the input render before focusing
+      requestAnimationFrame(() => inputRef.current?.select())
+    }
+  }, [isRenaming, label])
 
   const commitLabel = () => {
     const trimmed = draft.trim()
     if (trimmed && trimmed !== label) updateNodeLabel(id, trimmed)
     else setDraft(label)
-    setEditing(false)
+    setRenamingNodeId(null)
   }
+
+  const handleRunClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onRunToHere?.(id)
+  }, [id, onRunToHere])
+
+  const isRunning = status === 'running'
 
   return (
     <div
       className={cn(
-        'relative flex min-w-[160px] flex-col rounded-lg border',
+        'group/node relative flex min-w-[160px] flex-col rounded-lg border',
         'bg-[hsl(var(--node-bg))] shadow-md transition-all duration-150',
         status === 'error'
           ? 'border-red-500/50 ring-1 ring-red-500/20'
@@ -56,7 +72,7 @@ function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-3 py-2">
         <div className="flex min-w-0 flex-1 flex-col">
-          {editing ? (
+          {isRenaming ? (
             <input
               ref={inputRef}
               value={draft}
@@ -64,15 +80,14 @@ function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
               onBlur={commitLabel}
               onKeyDown={e => {
                 if (e.key === 'Enter') commitLabel()
-                if (e.key === 'Escape') { setDraft(label); setEditing(false) }
+                if (e.key === 'Escape') { setDraft(label); setRenamingNodeId(null) }
               }}
               className="w-full rounded bg-transparent text-xs font-medium text-foreground outline-none ring-1 ring-primary/60 px-1"
             />
           ) : (
             <span
               className="truncate text-xs font-medium text-foreground cursor-default"
-              onDoubleClick={() => { setDraft(label); setEditing(true) }}
-              title="Double-click to rename"
+              title="Right-click to rename"
             >
               {label}
             </span>
@@ -83,8 +98,27 @@ function NodeCardInner({ id, data, selected }: NodeProps<VrlNodeData>) {
           )}
         </div>
 
-        {/* Badge + status dot */}
+        {/* Play button + Badge + status dot */}
         <div className="flex shrink-0 items-center gap-1.5">
+          {onRunToHere && (
+            <button
+              onClick={handleRunClick}
+              disabled={isRunning}
+              className={cn(
+                'flex h-5 w-5 items-center justify-center rounded',
+                'transition-all duration-150',
+                isRunning
+                  ? 'bg-primary/20 text-primary cursor-wait'
+                  : 'bg-transparent text-muted-foreground opacity-0 group-hover/node:opacity-100 hover:bg-primary/20 hover:text-primary'
+              )}
+              title="Run to here"
+            >
+              {isRunning
+                ? <Loader2 className="h-3 w-3 animate-spin" />
+                : <Play className="h-3 w-3 fill-current" />
+              }
+            </button>
+          )}
           {manifest.badge_text && (
             <span
               className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none text-white"

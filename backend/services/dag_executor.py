@@ -41,13 +41,17 @@ class DAGExecutor:
         on_node_start: Any = None,
         on_node_done: Any = None,
         on_node_error: Any = None,
+        target_node_ids: list[str] | None = None,
     ) -> dict[str, dict[str, Any]]:
-        """Execute all nodes in the pipeline.
+        """Execute nodes in the pipeline.
 
         Args:
             pipeline: The pipeline to execute.
             context:  Runtime context dict passed to each executor.
             on_node_start/done/error: Optional async callbacks for status streaming.
+            target_node_ids: If provided, only execute these nodes and their
+                             ancestors (upstream dependencies). When None, all
+                             nodes are executed.
 
         Returns:
             Dict mapping node_id → output dict for every executed node.
@@ -56,6 +60,12 @@ class DAGExecutor:
             context = {}
 
         order = self.topological_sort(pipeline.nodes, pipeline.edges)
+
+        # Filter to ancestor subgraph when target nodes are specified
+        if target_node_ids:
+            required = self._collect_ancestors(target_node_ids, pipeline.edges, {n.id for n in pipeline.nodes})
+            order = [nid for nid in order if nid in required]
+            logger.info("Targeted execution — running %d of %d nodes", len(order), len(pipeline.nodes))
         logger.info("Execution order: %s", order)
 
         # Map: node_id → its execution output (from cache or fresh)
@@ -116,6 +126,38 @@ class DAGExecutor:
                     )
                 inputs[edge.targetPort] = value
         return inputs
+
+    # ── Ancestor collection (for targeted execution) ─────────────────────────
+
+    @staticmethod
+    def _collect_ancestors(
+        target_ids: list[str],
+        edges: list[PipelineEdge],
+        all_node_ids: set[str],
+    ) -> set[str]:
+        """Return the set of target nodes plus all their transitive ancestors."""
+        # Build reverse adjacency: child → set of parents
+        parents: dict[str, list[str]] = defaultdict(list)
+        for edge in edges:
+            parents[edge.target].append(edge.source)
+
+        required: set[str] = set()
+        queue: deque[str] = deque()
+
+        for nid in target_ids:
+            if nid in all_node_ids:
+                queue.append(nid)
+
+        while queue:
+            nid = queue.popleft()
+            if nid in required:
+                continue
+            required.add(nid)
+            for parent in parents.get(nid, []):
+                if parent not in required:
+                    queue.append(parent)
+
+        return required
 
     # ── Topological Sort (Kahn's Algorithm) ──────────────────────────────────
 

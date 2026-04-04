@@ -41,6 +41,7 @@ class PipelineJSON(BaseModel):
 class ExecuteRequest(BaseModel):
     pipeline: PipelineJSON
     project_path: str = ""
+    target_node_ids: list[str] | None = None  # Run only these nodes + ancestors
 
 
 class NodeStatus(BaseModel):

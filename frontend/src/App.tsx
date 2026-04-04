@@ -34,6 +34,7 @@ export function App() {
   const { manifests, loading, error, refresh: refreshNodes } = useNodeRegistry()
   const { executePipeline }           = useWebSocket()
   const selectedNodeId                = useUIStore(s => s.selectedNodeId)
+  const setRunToHereHandler           = useUIStore(s => s.setRunToHereHandler)
   const outputNodeId                  = useExecutionStore(s => s.outputPanelNodeId)
   const historyOpen                   = useProjectStore(s => s.historyOpen)
   const setHistoryOpen                = useProjectStore(s => s.setHistoryOpen)
@@ -41,6 +42,9 @@ export function App() {
   const saveProject                   = useProjectStore(s => s.saveProject)
   const closeProject                  = useProjectStore(s => s.closeProject)
   const createProject                 = useProjectStore(s => s.createProject)
+
+  // Track selected node count for "Run Selected" button
+  const selectedNodeCount = usePipelineStore(s => s.nodes.filter(n => n.selected).length)
 
   // Keyboard shortcuts for undo/redo
   const undo             = usePipelineStore(s => s.undo)
@@ -87,9 +91,30 @@ export function App() {
     return () => { cancelled = true; clearInterval(interval) }
   }, [])
 
+  // ── Execution modes ────────────────────────────────────────────────────────
+
   const handleRun = useCallback(() => {
     executePipeline(toPipelineJSON())
   }, [executePipeline, toPipelineJSON])
+
+  /** Run only selected nodes + their ancestors */
+  const handleRunSelected = useCallback(() => {
+    const { nodes } = usePipelineStore.getState()
+    const selectedIds = nodes.filter(n => n.selected).map(n => n.id)
+    if (selectedIds.length === 0) return
+    executePipeline(toPipelineJSON(), selectedIds)
+  }, [executePipeline, toPipelineJSON])
+
+  /** Run a single node + its ancestors (triggered from per-node play button) */
+  const handleRunToHere = useCallback((nodeId: string) => {
+    executePipeline(toPipelineJSON(), [nodeId])
+  }, [executePipeline, toPipelineJSON])
+
+  // Register the run-to-here handler so NodeCard play buttons work
+  useEffect(() => {
+    setRunToHereHandler(handleRunToHere)
+    return () => setRunToHereHandler(null)
+  }, [handleRunToHere, setRunToHereHandler])
 
   const handleSave = useCallback(async () => {
     if (!currentProject) return
@@ -188,7 +213,9 @@ export function App() {
       <Toolbar
         backendStatus={backendStatus}
         nodesLoaded={nodesLoaded}
+        selectedNodeCount={selectedNodeCount}
         onRun={handleRun}
+        onRunSelected={handleRunSelected}
         onSave={handleSave}
         onExport={handleExport}
         onToggleHistory={handleToggleHistory}

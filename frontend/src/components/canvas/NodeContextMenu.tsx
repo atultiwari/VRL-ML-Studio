@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { Download, Trash2 } from 'lucide-react'
+import { Download, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { exportNodePackage } from '@/lib/api'
+import { useUIStore } from '@/store/uiStore'
 
 interface NodeContextMenuProps {
   x: number
@@ -49,6 +50,11 @@ export function NodeContextMenu({ x, y, nodeId, nodeType, onClose, onDelete }: N
     onClose()
   }, [nodeType, onClose])
 
+  const handleRename = useCallback(() => {
+    useUIStore.getState().setRenamingNodeId(nodeId)
+    onClose()
+  }, [nodeId, onClose])
+
   const handleDelete = useCallback(() => {
     onDelete(nodeId)
     onClose()
@@ -63,6 +69,13 @@ export function NodeContextMenu({ x, y, nodeId, nodeType, onClose, onDelete }: N
       )}
       style={{ left: x, top: y }}
     >
+      <button
+        onClick={handleRename}
+        className="flex w-full items-center gap-2.5 px-3 py-1.5 text-xs text-foreground hover:bg-muted transition-colors"
+      >
+        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+        Rename
+      </button>
       <button
         onClick={handleExport}
         className="flex w-full items-center gap-2.5 px-3 py-1.5 text-xs text-foreground hover:bg-muted transition-colors"
