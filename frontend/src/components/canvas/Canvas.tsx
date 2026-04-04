@@ -217,8 +217,8 @@ export function Canvas({ manifests }: CanvasProps) {
   const openOutputPanel = useCallback((nodeId: string) => {
     // Dynamically import to avoid circular store dependency
     import('@/store/executionStore').then(({ useExecutionStore }) => {
-      const { nodeOutputs, openOutputPanel: open } = useExecutionStore.getState()
-      if (nodeOutputs[nodeId]) open(nodeId)
+      const { nodeOutputs, nodeErrors, openOutputPanel: open } = useExecutionStore.getState()
+      if (nodeOutputs[nodeId] || nodeErrors[nodeId]) open(nodeId)
     })
   }, [])
 
