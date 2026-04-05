@@ -1,11 +1,13 @@
 import { useCallback, useState } from 'react'
-import { Download, FileCode, FileText, Loader2, X } from 'lucide-react'
+import { Download, FileCode, FileJson, FileText, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { exportNotebook, exportPython } from '@/lib/api'
-import type { PipelineJSON } from '@/lib/types'
+import type { PipelineJSON, WorkflowExportJSON } from '@/lib/types'
 
-type ExportFormat = 'python' | 'notebook'
+type ExportFormat = 'python' | 'notebook' | 'workflow'
+
+const STUDIO_VERSION = '1.0.0'
 
 interface ExportDialogProps {
   open: boolean
@@ -14,8 +16,33 @@ interface ExportDialogProps {
   pipelineName: string
 }
 
+function buildWorkflowExport(pipeline: PipelineJSON, name: string): WorkflowExportJSON {
+  const nodeTypes = [...new Set(pipeline.nodes.map(n => n.type))]
+  return {
+    format: 'vrl-ml-studio-workflow',
+    format_version: '1.0',
+    studio_version: STUDIO_VERSION,
+    exported_at: new Date().toISOString(),
+    name,
+    description: '',
+    node_types_used: nodeTypes,
+    pipeline,
+  }
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 export function ExportDialog({ open, onClose, pipeline, pipelineName }: ExportDialogProps) {
-  const [format, setFormat] = useState<ExportFormat>('python')
+  const [format, setFormat] = useState<ExportFormat>('workflow')
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,21 +51,20 @@ export function ExportDialog({ open, onClose, pipeline, pipelineName }: ExportDi
     setError(null)
 
     try {
-      const blob = format === 'python'
-        ? await exportPython(pipeline, pipelineName)
-        : await exportNotebook(pipeline, pipelineName)
+      const safeName = pipelineName.replace(/\s+/g, '_').toLowerCase()
 
-      const ext = format === 'python' ? '.py' : '.ipynb'
-      const filename = pipelineName.replace(/\s+/g, '_').toLowerCase() + ext
-
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      if (format === 'workflow') {
+        const envelope = buildWorkflowExport(pipeline, pipelineName)
+        const json = JSON.stringify(envelope, null, 2)
+        const blob = new Blob([json], { type: 'application/json' })
+        downloadBlob(blob, `${safeName}.vrlflow`)
+      } else {
+        const blob = format === 'python'
+          ? await exportPython(pipeline, pipelineName)
+          : await exportNotebook(pipeline, pipelineName)
+        const ext = format === 'python' ? '.py' : '.ipynb'
+        downloadBlob(blob, safeName + ext)
+      }
 
       onClose()
     } catch (err) {
@@ -70,6 +96,24 @@ export function ExportDialog({ open, onClose, pipeline, pipelineName }: ExportDi
         {/* Format selection */}
         <div className="space-y-3 mb-6">
           <p className="text-sm text-muted-foreground">Choose export format:</p>
+
+          <button
+            onClick={() => setFormat('workflow')}
+            className={cn(
+              'flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors',
+              format === 'workflow'
+                ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                : 'border-border hover:bg-muted/50'
+            )}
+          >
+            <FileJson className={cn('h-8 w-8', format === 'workflow' ? 'text-primary' : 'text-muted-foreground')} />
+            <div>
+              <div className="font-medium text-foreground">Workflow</div>
+              <div className="text-xs text-muted-foreground">
+                .vrlflow file — share and import into any VRL ML Studio instance
+              </div>
+            </div>
+          </button>
 
           <button
             onClick={() => setFormat('python')}

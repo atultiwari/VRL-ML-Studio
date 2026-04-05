@@ -106,3 +106,16 @@ export interface PipelineJSON {
   nodes: PipelineNodeJSON[]
   edges: PipelineEdgeJSON[]
 }
+
+// ── Workflow export envelope (.vrlflow) ──────────────────────────────────────
+
+export interface WorkflowExportJSON {
+  format: 'vrl-ml-studio-workflow'
+  format_version: '1.0'
+  studio_version: string
+  exported_at: string
+  name: string
+  description: string
+  node_types_used: string[]
+  pipeline: PipelineJSON
+}

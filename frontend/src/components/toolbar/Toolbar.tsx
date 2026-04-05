@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, User, Zap } from 'lucide-react'
+import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Upload, User, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -16,11 +16,12 @@ interface ToolbarProps {
   onRunSelected?: () => void
   onSave?: () => void
   onExport?: () => void
+  onImportWorkflow?: () => void
   onToggleHistory?: () => void
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onToggleHistory, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onImportWorkflow, onToggleHistory, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -153,6 +154,17 @@ export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, wor
         >
           <Download className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Export</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onImportWorkflow}
+          className="gap-1.5"
+          title="Import a .vrlflow workflow file"
+        >
+          <Upload className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Import</span>
         </Button>
 
         <span className="mx-1 h-4 w-px bg-border" />

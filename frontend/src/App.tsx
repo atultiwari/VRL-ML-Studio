@@ -11,6 +11,7 @@ import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
 import { SmartWizard } from '@/components/wizard/SmartWizard'
 import { checkHealth } from '@/lib/api'
+import { pickWorkflowFile, parseWorkflowFile } from '@/lib/workflow-io'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
 import { useTenant } from '@/hooks/useTenant'
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -138,6 +139,30 @@ export function App() {
     setExportOpen(true)
   }, [])
 
+  const handleImportWorkflow = useCallback(async () => {
+    try {
+      const raw = await pickWorkflowFile()
+      const { pipeline, missingNodeTypes } = parseWorkflowFile(raw, manifests)
+
+      if (missingNodeTypes.length > 0) {
+        const proceed = window.confirm(
+          `This workflow uses node types not available in your studio:\n\n` +
+          missingNodeTypes.map(t => `  - ${t}`).join('\n') +
+          `\n\nImport anyway? Missing nodes will appear but cannot execute.`,
+        )
+        if (!proceed) return
+      }
+
+      loadPipelineFromJSON(pipeline, manifests)
+
+      // If we're on the dashboard, switch to canvas view
+      if (view === 'dashboard') setView('canvas')
+    } catch (err) {
+      if (err instanceof Error && err.message === 'No file selected') return
+      window.alert(err instanceof Error ? err.message : 'Failed to import workflow')
+    }
+  }, [manifests, loadPipelineFromJSON, view])
+
   const handleToggleHistory = useCallback(() => {
     setHistoryOpen(!historyOpen)
   }, [historyOpen, setHistoryOpen])
@@ -214,6 +239,7 @@ export function App() {
           backendStatus={backendStatus}
           nodesLoaded={nodesLoaded}
           workspaceName={tenant?.workspace_name}
+          onImportWorkflow={handleImportWorkflow}
           onGoHome={handleGoHome}
         />
         <ProjectDashboard onOpenProject={handleOpenProject} onOpenWizard={handleOpenWizard} />
@@ -233,6 +259,7 @@ export function App() {
         onRunSelected={handleRunSelected}
         onSave={handleSave}
         onExport={handleExport}
+        onImportWorkflow={handleImportWorkflow}
         onToggleHistory={handleToggleHistory}
         onGoHome={handleGoHome}
       />
