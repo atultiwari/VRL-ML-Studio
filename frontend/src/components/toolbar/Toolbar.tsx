@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Upload, User, Zap } from 'lucide-react'
+import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Shield, Upload, User, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -18,10 +18,12 @@ interface ToolbarProps {
   onExport?: () => void
   onImportWorkflow?: () => void
   onToggleHistory?: () => void
+  onAdmin?: () => void
+  adminEnabled?: boolean
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onImportWorkflow, onToggleHistory, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onImportWorkflow, onToggleHistory, onAdmin, adminEnabled: showAdmin, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -191,6 +193,16 @@ export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, wor
 
       {/* ── Right: Workspace + Status ── */}
       <div className="flex items-center gap-3">
+        {showAdmin && onAdmin && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onAdmin}
+            title="Super Admin"
+          >
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        )}
         {workspaceName && (
           <div className="hidden items-center gap-1.5 sm:flex">
             <User className="h-3.5 w-3.5 text-muted-foreground" />

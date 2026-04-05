@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     vrl_studio_version: str = "1.0.0"
     cors_origins: str = ""  # comma-separated extra origins (e.g. "https://demo.example.com")
 
+    # Super-admin credentials (set via env to enable admin panel)
+    admin_username: str = ""
+    admin_password: str = ""
+
     # Absolute path to the builtin node packages directory
     @property
     def builtin_packages_dir(self) -> Path:

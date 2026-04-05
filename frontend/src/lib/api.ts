@@ -108,6 +108,83 @@ export async function datasetPreview(
   return data
 }
 
+// ── Admin API ───────────────────────────────────────────────────────────────
+
+export async function adminCheckEnabled(): Promise<{ enabled: boolean }> {
+  const { data } = await api.get('/admin/enabled')
+  return data
+}
+
+export async function adminCheckSession(): Promise<{ authenticated: boolean }> {
+  const { data } = await api.get('/admin/session')
+  return data
+}
+
+export async function adminLogin(username: string, password: string): Promise<void> {
+  await api.post('/admin/login', { username, password })
+}
+
+export async function adminLogout(): Promise<void> {
+  await api.post('/admin/logout')
+}
+
+export interface AdminProject {
+  tenant_id: string
+  display_name: string
+  project_name: string
+  name: string
+  description: string
+  tags: string[]
+  node_count: number
+  created_at: string
+  last_modified: string
+}
+
+export async function adminListProjects(tenantId?: string): Promise<AdminProject[]> {
+  const params = tenantId ? { tenant_id: tenantId } : {}
+  const { data } = await api.get('/admin/projects', { params })
+  return data
+}
+
+export interface AdminWorkspace {
+  tenant_id: string
+  display_name: string
+  project_count: number
+}
+
+export async function adminListWorkspaces(): Promise<AdminWorkspace[]> {
+  const { data } = await api.get('/admin/workspaces')
+  return data
+}
+
+export async function adminDownloadProject(tenantId: string, projectName: string): Promise<Blob> {
+  const { data } = await api.get(`/admin/projects/${tenantId}/${projectName}/download`, {
+    responseType: 'blob',
+  })
+  return data
+}
+
+export async function adminBulkDownload(
+  projects: Array<{ tenant_id: string; project_name: string }>,
+): Promise<Blob> {
+  const { data } = await api.post('/admin/projects/bulk-download', { projects }, {
+    responseType: 'blob',
+    timeout: 120_000,
+  })
+  return data
+}
+
+export async function adminDeleteProject(tenantId: string, projectName: string): Promise<void> {
+  await api.delete(`/admin/projects/${tenantId}/${projectName}`)
+}
+
+export async function adminBulkDelete(
+  projects: Array<{ tenant_id: string; project_name: string }>,
+): Promise<{ deleted: string[]; errors: Array<{ project: string; error: string }> }> {
+  const { data } = await api.post('/admin/projects/bulk-delete', { projects })
+  return data
+}
+
 export async function uploadFile(file: File): Promise<{ path: string; name: string; size: number }> {
   const form = new FormData()
   form.append('file', file)

@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.logging import get_logger
 from core.settings import settings
 from core.tenant import COOKIE_NAME, TenantMiddleware, tenant_display_name
-from routers import execute, export, nodes, project, upload
+from routers import admin, execute, export, nodes, project, upload
 from services.cache import CacheService
 from services.dag_executor import DAGExecutor
 from services.node_registry import NodeRegistry
@@ -69,6 +69,7 @@ app.include_router(nodes.router)
 app.include_router(project.router)
 app.include_router(export.router)
 app.include_router(upload.router)
+app.include_router(admin.router)
 
 
 # ── Health ────────────────────────────────────────────────────────────────────

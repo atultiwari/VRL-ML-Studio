@@ -10,6 +10,9 @@ import { OnboardingTour } from '@/components/ui/OnboardingTour'
 import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProjectDashboard } from '@/components/dashboard/ProjectDashboard'
 import { SmartWizard } from '@/components/wizard/SmartWizard'
+import { AdminLogin } from '@/components/admin/AdminLogin'
+import { AdminDashboard } from '@/components/admin/AdminDashboard'
+import { adminCheckEnabled, adminCheckSession } from '@/lib/api'
 import { checkHealth } from '@/lib/api'
 import { pickWorkflowFile, parseWorkflowFile } from '@/lib/workflow-io'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
@@ -23,7 +26,7 @@ import { useWizardStore } from '@/store/wizardStore'
 import type { PipelineJSON } from '@/lib/types'
 
 type BackendStatus = 'connecting' | 'online' | 'offline'
-type View = 'dashboard' | 'canvas' | 'wizard'
+type View = 'dashboard' | 'canvas' | 'wizard' | 'admin-login' | 'admin'
 
 
 export function App() {
@@ -32,6 +35,8 @@ export function App() {
   const [view, setView] = useState<View>('dashboard')
   const [exportOpen, setExportOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [adminEnabled, setAdminEnabled] = useState(false)
+  const [previousView, setPreviousView] = useState<View>('dashboard')
 
   const setSidebarOpen                  = useUIStore(s => s.setSidebarOpen)
 
@@ -104,6 +109,27 @@ export function App() {
     const interval = setInterval(ping, 30_000)
     return () => { cancelled = true; clearInterval(interval) }
   }, [])
+
+  // Check if admin panel is enabled
+  useEffect(() => {
+    adminCheckEnabled().then(r => setAdminEnabled(r.enabled)).catch(() => {})
+  }, [])
+
+  const handleOpenAdmin = useCallback(async () => {
+    // Check if already authenticated
+    try {
+      const { authenticated } = await adminCheckSession()
+      setPreviousView(view === 'admin' || view === 'admin-login' ? 'dashboard' : view)
+      setView(authenticated ? 'admin' : 'admin-login')
+    } catch {
+      setPreviousView(view === 'admin' || view === 'admin-login' ? 'dashboard' : view)
+      setView('admin-login')
+    }
+  }, [view])
+
+  const handleAdminBack = useCallback(() => {
+    setView(previousView)
+  }, [previousView])
 
   // ── Execution modes ────────────────────────────────────────────────────────
 
@@ -221,6 +247,15 @@ export function App() {
     setView('dashboard')
   }, [])
 
+  // ── Admin views ──
+  if (view === 'admin-login') {
+    return <AdminLogin onSuccess={() => setView('admin')} onBack={handleAdminBack} />
+  }
+
+  if (view === 'admin') {
+    return <AdminDashboard onBack={handleAdminBack} />
+  }
+
   // ── Wizard view ──
   if (view === 'wizard') {
     return (
@@ -240,6 +275,8 @@ export function App() {
           nodesLoaded={nodesLoaded}
           workspaceName={tenant?.workspace_name}
           onImportWorkflow={handleImportWorkflow}
+          onAdmin={handleOpenAdmin}
+          adminEnabled={adminEnabled}
           onGoHome={handleGoHome}
         />
         <ProjectDashboard onOpenProject={handleOpenProject} onOpenWizard={handleOpenWizard} />
@@ -261,6 +298,8 @@ export function App() {
         onExport={handleExport}
         onImportWorkflow={handleImportWorkflow}
         onToggleHistory={handleToggleHistory}
+        onAdmin={handleOpenAdmin}
+        adminEnabled={adminEnabled}
         onGoHome={handleGoHome}
       />
 
