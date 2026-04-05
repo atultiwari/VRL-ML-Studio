@@ -124,16 +124,54 @@ async def dataset_preview(body: DatasetPreviewRequest) -> JSONResponse:
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
         df = result["dataframe_out"]
-    columns = [
-        {
+    import numpy as np
+
+    n_rows = len(df)
+    columns = []
+    for col in df.columns:
+        series = df[col]
+        is_numeric = series.dtype.kind in ("i", "f")
+        missing = int(series.isnull().sum())
+        unique = int(series.nunique())
+        col_info: dict[str, Any] = {
             "name": col,
-            "dtype": str(df[col].dtype),
-            "missing": int(df[col].isnull().sum()),
-            "unique": int(df[col].nunique()),
-            "is_numeric": df[col].dtype.kind in ("i", "f"),
+            "dtype": str(series.dtype),
+            "missing": missing,
+            "unique": unique,
+            "is_numeric": is_numeric,
+            "missing_pct": round(missing / n_rows * 100, 1) if n_rows > 0 else 0.0,
+            "cardinality_ratio": round(unique / n_rows, 3) if n_rows > 0 else 0.0,
         }
-        for col in df.columns
-    ]
+        if is_numeric:
+            clean = series.dropna()
+            if len(clean) > 0:
+                q1 = float(clean.quantile(0.25))
+                q3 = float(clean.quantile(0.75))
+                iqr = q3 - q1
+                outlier_mask = (clean < q1 - 1.5 * iqr) | (clean > q3 + 1.5 * iqr)
+                col_info["skewness"] = round(float(clean.skew()), 2)
+                col_info["outlier_count"] = int(outlier_mask.sum())
+                col_info["mean"] = round(float(clean.mean()), 4)
+                col_info["std"] = round(float(clean.std()), 4)
+                col_info["min"] = float(clean.min())
+                col_info["max"] = float(clean.max())
+            else:
+                col_info["skewness"] = 0.0
+                col_info["outlier_count"] = 0
+                col_info["mean"] = 0.0
+                col_info["std"] = 0.0
+                col_info["min"] = 0.0
+                col_info["max"] = 0.0
+        else:
+            col_info["skewness"] = None
+            col_info["outlier_count"] = 0
+            # Top frequency ratio for categorical dominance detection
+            top_freq = int(series.value_counts().iloc[0]) if unique > 0 else 0
+            col_info["top_freq_ratio"] = round(top_freq / n_rows, 3) if n_rows > 0 else 0.0
+        columns.append(col_info)
+
+    # Duplicate row count
+    duplicate_rows = int(df.duplicated().sum())
 
     # Send first 5 rows for preview
     preview = df.head(5).fillna("").values.tolist()
@@ -143,6 +181,7 @@ async def dataset_preview(body: DatasetPreviewRequest) -> JSONResponse:
         "column_names": list(df.columns),
         "shape": list(df.shape),
         "preview": preview,
+        "duplicate_rows": duplicate_rows,
     })
 
 

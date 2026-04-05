@@ -89,6 +89,17 @@ export interface DatasetColumnInfo {
   missing: number
   unique: number
   is_numeric: boolean
+  missing_pct: number
+  cardinality_ratio: number
+  // Numeric-only fields
+  skewness: number | null
+  outlier_count: number
+  mean?: number
+  std?: number
+  min?: number
+  max?: number
+  // Categorical-only fields
+  top_freq_ratio?: number
 }
 
 export interface DatasetPreviewResponse {
@@ -96,6 +107,7 @@ export interface DatasetPreviewResponse {
   column_names: string[]
   shape: [number, number]
   preview: unknown[][]
+  duplicate_rows: number
 }
 
 export async function datasetPreview(

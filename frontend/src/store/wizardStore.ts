@@ -1,14 +1,19 @@
 import { create } from 'zustand'
 import type { DatasetColumnInfo } from '@/lib/api'
 
-export type TaskType = 'classification' | 'regression'
+export type TaskType = 'classification' | 'regression' | 'clustering'
 
 export type DatasetSource = 'sample' | 'upload'
+
+export type WizardTemplate = 'custom' | 'quick_classification' | 'thorough_comparison' | 'eda_only' | 'clustering_explore'
 
 export interface WizardState {
   // Navigation
   step: number
   totalSteps: number
+
+  // Template
+  template: WizardTemplate
 
   // Step 1: Dataset
   datasetSource: DatasetSource
@@ -21,6 +26,7 @@ export interface WizardState {
   columnNames: string[]
   shape: [number, number]
   preview: unknown[][]
+  duplicateRows: number
   loadingPreview: boolean
 
   // Step 3: Target & Features
@@ -33,7 +39,12 @@ export interface WizardState {
   encodingMethod: string
   scalingMethod: string
 
-  // Step 5: Train/Test Split
+  // Step 5: Outlier Handling
+  outlierMethod: 'skip' | 'iqr' | 'zscore'
+  outlierAction: 'remove' | 'cap' | 'flag'
+  outlierThreshold: number
+
+  // Step 6: Train/Test Split
   testSize: number
   stratify: boolean
   randomState: number
@@ -50,6 +61,8 @@ interface WizardActions {
   nextStep: () => void
   prevStep: () => void
 
+  setTemplate: (v: WizardTemplate) => void
+
   setDatasetSource: (v: DatasetSource) => void
   setSampleDataset: (v: string) => void
   setUploadedFile: (path: string, name: string) => void
@@ -58,6 +71,7 @@ interface WizardActions {
     columnNames: string[]
     shape: [number, number]
     preview: unknown[][]
+    duplicateRows: number
   }) => void
   setLoadingPreview: (v: boolean) => void
 
@@ -68,6 +82,10 @@ interface WizardActions {
   setImputeStrategy: (v: string) => void
   setEncodingMethod: (v: string) => void
   setScalingMethod: (v: string) => void
+
+  setOutlierMethod: (v: 'skip' | 'iqr' | 'zscore') => void
+  setOutlierAction: (v: 'remove' | 'cap' | 'flag') => void
+  setOutlierThreshold: (v: number) => void
 
   setTestSize: (v: number) => void
   setStratify: (v: boolean) => void
@@ -82,7 +100,8 @@ interface WizardActions {
 
 const INITIAL_STATE: WizardState = {
   step: 0,
-  totalSteps: 7,
+  totalSteps: 8,
+  template: 'custom',
   datasetSource: 'sample',
   sampleDataset: 'iris',
   uploadedFilePath: '',
@@ -91,6 +110,7 @@ const INITIAL_STATE: WizardState = {
   columnNames: [],
   shape: [0, 0],
   preview: [],
+  duplicateRows: 0,
   loadingPreview: false,
   targetColumn: '',
   featureColumns: [],
@@ -98,6 +118,9 @@ const INITIAL_STATE: WizardState = {
   imputeStrategy: 'mean',
   encodingMethod: 'onehot',
   scalingMethod: 'standard',
+  outlierMethod: 'skip',
+  outlierAction: 'cap',
+  outlierThreshold: 1.5,
   testSize: 0.2,
   stratify: true,
   randomState: 42,
@@ -112,6 +135,8 @@ export const useWizardStore = create<WizardState & WizardActions>((set) => ({
   nextStep: () => set(s => ({ step: Math.min(s.step + 1, s.totalSteps - 1) })),
   prevStep: () => set(s => ({ step: Math.max(s.step - 1, 0) })),
 
+  setTemplate: (template) => set({ template }),
+
   setDatasetSource: (datasetSource) => set({ datasetSource }),
   setSampleDataset: (sampleDataset) => set({ sampleDataset }),
   setUploadedFile: (path, name) => set({ uploadedFilePath: path, uploadedFileName: name }),
@@ -120,6 +145,7 @@ export const useWizardStore = create<WizardState & WizardActions>((set) => ({
     columnNames: data.columnNames,
     shape: data.shape,
     preview: data.preview,
+    duplicateRows: data.duplicateRows,
   }),
   setLoadingPreview: (loadingPreview) => set({ loadingPreview }),
 
@@ -130,6 +156,10 @@ export const useWizardStore = create<WizardState & WizardActions>((set) => ({
   setImputeStrategy: (imputeStrategy) => set({ imputeStrategy }),
   setEncodingMethod: (encodingMethod) => set({ encodingMethod }),
   setScalingMethod: (scalingMethod) => set({ scalingMethod }),
+
+  setOutlierMethod: (outlierMethod) => set({ outlierMethod }),
+  setOutlierAction: (outlierAction) => set({ outlierAction }),
+  setOutlierThreshold: (outlierThreshold) => set({ outlierThreshold }),
 
   setTestSize: (testSize) => set({ testSize }),
   setStratify: (stratify) => set({ stratify }),
