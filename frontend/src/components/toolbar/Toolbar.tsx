@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Shield, Upload, User, Zap } from 'lucide-react'
+import { Activity, Download, FolderOpen, GitBranch, Loader2, Play, Save, Share2, Shield, Upload, User, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -16,6 +16,7 @@ interface ToolbarProps {
   onRunSelected?: () => void
   onSave?: () => void
   onExport?: () => void
+  onShare?: () => void
   onImportWorkflow?: () => void
   onToggleHistory?: () => void
   onAdmin?: () => void
@@ -23,7 +24,7 @@ interface ToolbarProps {
   onGoHome?: () => void
 }
 
-export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onImportWorkflow, onToggleHistory, onAdmin, adminEnabled: showAdmin, onGoHome }: ToolbarProps) {
+export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, workspaceName, onRun, onRunSelected, onSave, onExport, onShare, onImportWorkflow, onToggleHistory, onAdmin, adminEnabled: showAdmin, onGoHome }: ToolbarProps) {
   const undo       = usePipelineStore(s => s.undo)
   const redo       = usePipelineStore(s => s.redo)
   const canUndo    = usePipelineStore(s => s.past.length > 0)
@@ -156,6 +157,18 @@ export function Toolbar({ backendStatus, nodesLoaded, selectedNodeCount = 0, wor
         >
           <Download className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Export</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={nodeCount === 0}
+          onClick={onShare}
+          className="gap-1.5"
+          title="Share this workflow via link"
+        >
+          <Share2 className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Share</span>
         </Button>
 
         <Button

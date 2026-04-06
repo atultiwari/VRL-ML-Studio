@@ -5,6 +5,7 @@ import { ParamPanel } from '@/components/panel/ParamPanel'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import { ExportDialog } from '@/components/toolbar/ExportDialog'
+import { ShareDialog } from '@/components/toolbar/ShareDialog'
 import { KeyboardShortcutsPanel } from '@/components/ui/KeyboardShortcutsPanel'
 import { OnboardingTour } from '@/components/ui/OnboardingTour'
 import { HistoryPanel } from '@/components/history/HistoryPanel'
@@ -13,7 +14,7 @@ import { SmartWizard } from '@/components/wizard/SmartWizard'
 import { AdminLogin } from '@/components/admin/AdminLogin'
 import { AdminDashboard } from '@/components/admin/AdminDashboard'
 import { adminCheckEnabled, adminCheckSession } from '@/lib/api'
-import { checkHealth } from '@/lib/api'
+import { checkHealth, getSharedWorkflow } from '@/lib/api'
 import { pickWorkflowFile, parseWorkflowFile } from '@/lib/workflow-io'
 import { useNodeRegistry } from '@/hooks/useNodeRegistry'
 import { useTenant } from '@/hooks/useTenant'
@@ -34,7 +35,9 @@ export function App() {
   const [nodesLoaded, setNodesLoaded] = useState<number | undefined>()
   const [view, setView] = useState<View>('dashboard')
   const [exportOpen, setExportOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [sharedWorkflowName, setSharedWorkflowName] = useState<string | null>(null)
   const [adminEnabled, setAdminEnabled] = useState(false)
   const [previousView, setPreviousView] = useState<View>('dashboard')
 
@@ -115,6 +118,29 @@ export function App() {
     adminCheckEnabled().then(r => setAdminEnabled(r.enabled)).catch(() => {})
   }, [])
 
+  // Detect shared workflow URL: #/shared/{token}
+  useEffect(() => {
+    const loadShared = async () => {
+      const hash = window.location.hash
+      const match = hash.match(/^#\/shared\/([a-f0-9]+)$/)
+      if (!match) return
+      const token = match[1]
+      try {
+        const shared = await getSharedWorkflow(token)
+        loadPipelineFromJSON(shared.pipeline, manifests)
+        setSharedWorkflowName(shared.name)
+        setView('canvas')
+        // Clean the hash so refreshing doesn't re-trigger, but keep it visible
+      } catch {
+        window.alert('Could not load shared workflow. The link may be invalid or expired.')
+      }
+    }
+    // Wait for manifests to load before resolving shared link
+    if (!loading && manifests.length > 0) {
+      loadShared()
+    }
+  }, [loading, manifests, loadPipelineFromJSON]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleOpenAdmin = useCallback(async () => {
     // Check if already authenticated
     try {
@@ -163,6 +189,10 @@ export function App() {
 
   const handleExport = useCallback(() => {
     setExportOpen(true)
+  }, [])
+
+  const handleShare = useCallback(() => {
+    setShareOpen(true)
   }, [])
 
   const handleImportWorkflow = useCallback(async () => {
@@ -296,6 +326,7 @@ export function App() {
         onRunSelected={handleRunSelected}
         onSave={handleSave}
         onExport={handleExport}
+        onShare={handleShare}
         onImportWorkflow={handleImportWorkflow}
         onToggleHistory={handleToggleHistory}
         onAdmin={handleOpenAdmin}
@@ -319,6 +350,13 @@ export function App() {
         onClose={() => setExportOpen(false)}
         pipeline={toPipelineJSON()}
         pipelineName={currentProject?.name ?? 'Untitled Pipeline'}
+      />
+
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        pipeline={toPipelineJSON()}
+        pipelineName={sharedWorkflowName ?? currentProject?.name ?? 'Untitled Pipeline'}
       />
 
       <KeyboardShortcutsPanel

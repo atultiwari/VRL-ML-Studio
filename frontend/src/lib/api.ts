@@ -197,6 +197,36 @@ export async function adminBulkDelete(
   return data
 }
 
+// ── Share API ──────────────────────────────────────────────────────────────
+
+export interface SharedWorkflow {
+  pipeline: import('./types').PipelineJSON
+  name: string
+  description: string
+  created_at: string
+  studio_version: string
+}
+
+export async function createShareLink(
+  pipeline: import('./types').PipelineJSON,
+  name: string,
+  description: string = '',
+): Promise<{ token: string; created_at: string }> {
+  const { data } = await api.post('/share/create', { pipeline, name, description })
+  return data
+}
+
+export async function getSharedWorkflow(token: string): Promise<SharedWorkflow> {
+  const { data } = await api.get<SharedWorkflow>(`/share/${token}`)
+  return data
+}
+
+export async function revokeShareLink(token: string): Promise<void> {
+  await api.delete(`/share/${token}`)
+}
+
+// ── Upload API ─────────────────────────────────────────────────────────────
+
 export async function uploadFile(file: File): Promise<{ path: string; name: string; size: number }> {
   const form = new FormData()
   form.append('file', file)
